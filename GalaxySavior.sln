@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GalaxySavior", "GalaxySavior\GalaxySavior.vcxproj", "{61E72C00-FD5E-4D56-8D50-8E6072DD4035}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3} = {2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "Graphics\Graphics.vcxproj", "{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameEngine", "GameEngine\GameEngine.vcxproj", "{911DE6D0-7419-4DB0-B691-C76C133A8B45}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Debug|x64.ActiveCfg = Debug|x64
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Debug|x64.Build.0 = Debug|x64
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Debug|x86.ActiveCfg = Debug|Win32
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Debug|x86.Build.0 = Debug|Win32
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Release|x64.ActiveCfg = Release|x64
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Release|x64.Build.0 = Release|x64
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Release|x86.ActiveCfg = Release|Win32
+		{61E72C00-FD5E-4D56-8D50-8E6072DD4035}.Release|x86.Build.0 = Release|Win32
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Debug|x64.ActiveCfg = Debug|x64
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Debug|x64.Build.0 = Debug|x64
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Debug|x86.ActiveCfg = Debug|Win32
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Debug|x86.Build.0 = Debug|Win32
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Release|x64.ActiveCfg = Release|x64
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Release|x64.Build.0 = Release|x64
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Release|x86.ActiveCfg = Release|Win32
+		{2391AB64-39BA-41F1-9D9A-81D29B4FFFB3}.Release|x86.Build.0 = Release|Win32
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Debug|x64.ActiveCfg = Debug|x64
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Debug|x64.Build.0 = Debug|x64
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Debug|x86.ActiveCfg = Debug|Win32
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Debug|x86.Build.0 = Debug|Win32
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Release|x64.ActiveCfg = Release|x64
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Release|x64.Build.0 = Release|x64
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Release|x86.ActiveCfg = Release|Win32
+		{911DE6D0-7419-4DB0-B691-C76C133A8B45}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
