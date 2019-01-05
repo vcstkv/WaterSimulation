@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.5)	
+
 file(GLOB ROOT_SOURCE *.cpp)
 file(GLOB ROOT_INLINE *.inl)
 file(GLOB ROOT_HEADER *.hpp)
@@ -42,8 +44,6 @@ source_group("SIMD Files" FILES ${SIMD_SOURCE})
 source_group("SIMD Files" FILES ${SIMD_INLINE})
 source_group("SIMD Files" FILES ${SIMD_HEADER})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-
 add_library(glm_static STATIC ${ROOT_TEXT} ${ROOT_MD} ${ROOT_NAT}
 	${ROOT_SOURCE}    ${ROOT_INLINE}    ${ROOT_HEADER}
 	${CORE_SOURCE}    ${CORE_INLINE}    ${CORE_HEADER}
@@ -52,11 +52,15 @@ add_library(glm_static STATIC ${ROOT_TEXT} ${ROOT_MD} ${ROOT_NAT}
 	${GTX_SOURCE}     ${GTX_INLINE}     ${GTX_HEADER}
 	${SIMD_SOURCE}    ${SIMD_INLINE}    ${SIMD_HEADER})
 
-add_library(glm_shared SHARED ${ROOT_TEXT} ${ROOT_MD} ${ROOT_NAT}
-	${ROOT_SOURCE}    ${ROOT_INLINE}    ${ROOT_HEADER}
-	${CORE_SOURCE}    ${CORE_INLINE}    ${CORE_HEADER}
-	${EXT_SOURCE}     ${EXT_INLINE}     ${EXT_HEADER}
-	${GTC_SOURCE}     ${GTC_INLINE}     ${GTC_HEADER}
-	${GTX_SOURCE}     ${GTX_INLINE}     ${GTX_HEADER}
-	${SIMD_SOURCE}    ${SIMD_INLINE}    ${SIMD_HEADER})
+#add_library(glm_shared SHARED ${ROOT_TEXT} ${ROOT_MD} ${ROOT_NAT}
+#	${ROOT_SOURCE}    ${ROOT_INLINE}    ${ROOT_HEADER}
+#	${CORE_SOURCE}    ${CORE_INLINE}    ${CORE_HEADER}
+#	${EXT_SOURCE}     ${EXT_INLINE}     ${EXT_HEADER}
+#	${GTC_SOURCE}     ${GTC_INLINE}     ${GTC_HEADER}
+#	${GTX_SOURCE}     ${GTX_INLINE}     ${GTX_HEADER}
+#	${SIMD_SOURCE}    ${SIMD_INLINE}    ${SIMD_HEADER})
+	
+target_include_directories(glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+#target_include_directories(glm_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
