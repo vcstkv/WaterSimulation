@@ -8,4 +8,7 @@ else()
 	add_compile_options(-W -Wall -Werror)
 endif()
 
-add_subdirectory(src/Simulator)		
+add_subdirectory(src/FilesIOLib)
+add_subdirectory(src/GraphicsLib)
+add_subdirectory(src/GUILib)
+add_subdirectory(src/Simulator)

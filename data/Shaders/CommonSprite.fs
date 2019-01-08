@@ -23,5 +23,5 @@ void main()
 	{
 		texColor = texture(textureSampler, uv);
 	}
-	resultColor = texColor;
+	resultColor = vec4(texColor.rgb, texColor.a);
 }
