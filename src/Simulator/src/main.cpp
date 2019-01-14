@@ -7,8 +7,8 @@
 void main()
 {
 	ScreenController *screenController;
-	int screenWidth = 800;
-	int screenHeight = 700;
+	int screenWidth = 1280;
+	int screenHeight = 900;
 	screenController = new ScreenController(screenWidth, screenHeight, &std::string("Water Simulation"));
 	screenController->AddScreen(new SPHScreen(screenWidth, screenHeight));
 	screenController->StartMainLoop();
