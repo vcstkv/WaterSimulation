@@ -32,13 +32,13 @@ void CommonSprite::Draw(glm::mat4 *projection, glm::mat4 *view)
 {
 	if (shaderPrograms.empty())
 	{
-		std::cout << "There are no any shaders attached to sprite";
+		std::cout << "\nThere are no any shaders attached to sprite";
 		return;
 	}
 
 	if (currentShaderProgram == -1)
 	{
-		std::cout << "Shader is not set";
+		std::cout << "\nShader is not set";
 		return;
 	}
 
