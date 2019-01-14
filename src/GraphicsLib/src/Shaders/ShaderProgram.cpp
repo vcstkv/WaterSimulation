@@ -1,3 +1,4 @@
+#define GRAPHICS_EXPORTS
 #include "Graphics/Shaders/ShaderProgram.h"
 #include "Graphics/GraphicsResources.h"
 

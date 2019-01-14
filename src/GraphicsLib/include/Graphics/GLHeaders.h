@@ -6,3 +6,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm\glm.hpp"
 #include "glm\gtx\transform.hpp"
+
+#ifdef GRAPHICS_EXPORTS
+#define GRAPHICS_API __declspec(dllexport) 
+#else
+#define GRAPHICS_API __declspec(dllimport)
+#endif

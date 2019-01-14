@@ -1,9 +1,4 @@
 #pragma once
-#ifdef GRAPHICS_EXPORTS
-#define GRAPHICS_API __declspec(dllexport) 
-#else
-#define GRAPHICS_API __declspec(dllimport)
-#endif
 
 #include "GLHeaders.h"
 #include "Shaders/SpriteShaderProgram.h"
@@ -22,7 +17,7 @@ public:
 	GRAPHICS_API ~Graphics();
 	//GRAPHICS_API void DrawText(TextBlock *textBlock, glm::mat4 *projection, SpriteShaderProgram *spriteShader, bool isRected);
 	GRAPHICS_API void DrawLine(float x1, float y1, float x2, float y2, glm::vec4 *color, glm::mat4 *projection);
-	void SetScreenSize(int width, int height) { screenHeight = height; screenWidth = width; }
+	GRAPHICS_API void SetScreenSize(int width, int height);
 	int screenWidth;
 	int screenHeight;
 

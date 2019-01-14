@@ -2,9 +2,6 @@
 #include "Graphics/GLHeaders.h"
 #include "Graphics/Shaders/SpriteShaderProgram.h"
 
-
-
-
 class Line
 {
 

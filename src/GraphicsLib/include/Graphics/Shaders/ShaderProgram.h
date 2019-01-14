@@ -11,12 +11,12 @@
 class ShaderProgram
 {
 public:
-	ShaderProgram();
-	void Enable();
-	void Disable();
-	bool AddShader(GLenum type, const char* fileName);
-	bool Link();
-	~ShaderProgram();
+	GRAPHICS_API ShaderProgram();
+	GRAPHICS_API void Enable();
+	GRAPHICS_API void Disable();
+	GRAPHICS_API bool AddShader(GLenum type, const char* fileName);
+	GRAPHICS_API bool Link();
+	GRAPHICS_API ~ShaderProgram();
 protected:
 	GLuint id;
 private:

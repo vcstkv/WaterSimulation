@@ -41,6 +41,12 @@ void Graphics::DrawLine(float x1, float y1, float x2, float y2, glm::vec4 *color
 	line->Draw(projection);
 }
 
+void Graphics::SetScreenSize(int width, int height)
+{
+	screenHeight = height;
+	screenWidth = width;
+}
+
 //void Graphics::DrawText(TextBlock *textBlock, glm::mat4 *projection, SpriteShaderProgram *spriteShader, bool isRected)
 //{
 //	textBlock->font->DrawText(textBlock->text, textBlock->fontSize, &textBlock->color, textBlock->x, textBlock->y, projection, spriteShader, isRected);
