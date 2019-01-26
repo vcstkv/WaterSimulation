@@ -1,6 +1,8 @@
 #define GAMEENGINE_EXPORTS
 #include "GUI/ScreenController.h"
 #include "GUI/Screen.h"
+#include <thread>
+#include <chrono>
 
 
 ScreenController::ScreenController(int screenWidth, int screenHeight, std::string *title)
@@ -14,7 +16,38 @@ ScreenController::ScreenController(int screenWidth, int screenHeight, std::strin
 		exit(1);
 	}
 
-	//glfwSetMouseButtonCallback(window->GetGLFW(), &OnMouseEvent);
+	window->SetMouseButtonEventCb(
+	[](int btn, int action, int mods, void *data)
+	{
+		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
+		if (!s || s->empty())
+		{
+			return;
+		}
+		s->back()->OnMouseButtonEvent(btn, action, mods);
+	}, screens);
+
+	window->SetMouseCursorEventCb(
+	[](double x, double y, void *data)
+	{
+		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
+		if (!s || s->empty())
+		{
+			return;
+		}
+		s->back()->OnMouseCursorEvent(x, y);
+	}, screens);
+
+	window->SetKeyboardEventCb(
+	[](int btn, int scanCode, int action, int mods, void *data)
+	{
+		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
+		if (!s || s->empty())
+		{
+			return;
+		}
+		s->back()->OnKeyboardEvent(btn, scanCode, action, mods);
+	}, screens);
 
 	this->screenHeight = screenHeight;
 	this->screenWidth = screenWidth;
@@ -39,17 +72,16 @@ ScreenController::~ScreenController()
 void ScreenController::StartMainLoop()
 {
 	double lastTime = 0;
-	float delta = 0;
+	double delta = 0;
 	int FPS = 60;
-	double constTimeTick = 1. / FPS;
+	long constTimeTick = 1. / FPS;
 	do
 	{
-
-		OnKeyboardEvent();
-		while (window->GetTime() - lastTime < constTimeTick) {}
+		//OnKeyboardEvent();
+		//std::this_thread::sleep_for(std::chrono::microseconds(constTimeTick));
 		delta = window->GetTime() - lastTime;
 
-		lastTime = window->GetTime();
+		lastTime = delta + lastTime;
 
 		UpdateScreen(delta);
 
@@ -59,14 +91,8 @@ void ScreenController::StartMainLoop()
 
 		//printf("\nFPS: %f", delta);
 		
-
 	} while (window->IsWindowShouldClose());
 }
-
-//void OnMouseEvent(GLFWwindow *window, int button, int action, int mods)
-//{
-//	printf("mouseCallBack");
-//}
 
 void ScreenController::OnKeyboardEvent()
 {
@@ -118,7 +144,7 @@ void ScreenController::DrawScreen(Graphics *graphics)
 	screens->back()->Render(graphics);
 }
 
-void ScreenController::UpdateScreen(float delta)
+void ScreenController::UpdateScreen(double delta)
 {
 	screens->back()->Update(delta);
 }

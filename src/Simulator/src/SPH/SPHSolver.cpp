@@ -8,7 +8,6 @@ typedef unsigned int uint;
 void SPHSolver::Advect(SPHFluidParams &params, std::vector<SPHParticle> &particles)
 {
 	UpdateDensity(params, particles);
-	UpdateVelocity(params, particles);
 	UpdatePosition(params, particles);
 }
 
@@ -29,22 +28,15 @@ void SPHSolver::UpdateDensity(SPHFluidParams &params, std::vector<SPHParticle> &
 	}
 }
 
-void SPHSolver::UpdateVelocity(SPHFluidParams &params, std::vector<SPHParticle> &particles)
-{
-	//glm::dvec3 oldAcc;
-	for (uint i = 0; i < particles.size(); i++)
-	{
-		//oldAcc = particles[i].acc;
-		particles[i].acc = (InternalForces(params, particles, i) + ExternalForces(params, particles, i)) / particles[i].density;
-		particles[i].vel += particles[i].acc * params.dt;
-	}
-}
-
 void SPHSolver::UpdatePosition(SPHFluidParams &params, std::vector<SPHParticle> &particles)
 {
+	glm::dvec3 oldAcc;
 	for (uint i = 0; i < particles.size(); i++)
 	{
-		particles[i].pos += particles[i].vel * params.dt;// +particles[i].acc / 2. * params.dt * params.dt;
+		oldAcc = particles[i].acc;
+		particles[i].acc = (InternalForces(params, particles, i) /*+ ExternalForces(params, particles, i)*/) / particles[i].density;
+		//particles[i].pos += (particles[i].vel + oldAcc / 2. * params.dt) * params.dt;
+		//particles[i].vel += (particles[i].acc + oldAcc) / 2. * params.dt;	
 	}
 }
 
@@ -55,7 +47,7 @@ double SPHSolver::Distance(glm::dvec3 &p1, glm::dvec3 &p2)
 
 double SPHSolver::Pressure(SPHFluidParams &params, SPHParticle &p)
 {
-	return params.stiffness * (p.density - params.restDensity);
+	return params.stiffness * params.stiffness * params.restDensity / 1. * (pow(p.density/params.restDensity, 1.) - 1);
 }
 
 glm::dvec3 SPHSolver::InternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum)

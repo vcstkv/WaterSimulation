@@ -136,6 +136,18 @@ void MainScreen::OnKeyPress(int buttonID, bool isPressed)
 	}
 }
 
+void MainScreen::OnMouseButtonEvent(int btn, int action, int mods)
+{
+}
+
+void MainScreen::OnMouseCursorEvent(double x, double y)
+{
+}
+
+void MainScreen::OnKeyboardEvent(int key, int scanCode, int action, int mods)
+{
+}
+
 void MainScreen::OnKeyRelease(int buttonID)
 {
 	switch (buttonID)

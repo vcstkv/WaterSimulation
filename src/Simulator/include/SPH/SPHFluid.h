@@ -17,9 +17,9 @@ public:
 	~SPHFluid();
 	void Update(double delta);
 	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);
+	void DragParticle(double x, double y, uint particleNum);
 	void Init();
 private:
-	CommonSprite *sprite;
 	SPHFluidParams params;
 	std::vector<SPHParticle> *particles;
 };
