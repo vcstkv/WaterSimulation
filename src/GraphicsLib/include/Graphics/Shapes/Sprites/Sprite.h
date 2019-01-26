@@ -9,7 +9,7 @@ public:
 	GRAPHICS_API Sprite(float x, float y);
 	GRAPHICS_API ~Sprite();
 	GRAPHICS_API virtual void Draw(glm::mat4 *projection, glm::mat4 *view) = 0;
-	GRAPHICS_API void SetSize(int width, int height);
+	GRAPHICS_API void SetSize(float width, float height);
 	GRAPHICS_API void SetTextureShape(float uvX, float uvY, int width, int height);
 	GRAPHICS_API void SetColor(glm::vec4 *color);
 	GRAPHICS_API void SetTexture(const char* filePath, bool isStdFolder = true);
@@ -22,8 +22,8 @@ public:
 	GRAPHICS_API virtual void SetShader(const char *vFilePath, const char *fFilePath) = 0;
 	GRAPHICS_API void SetActiveShaderProgram(int localShaderProgramId);
 	static void SetTexturesController(TexturesController *texturesController);
-	int width;
-	int height;
+	float width;
+	float height;
 protected:
 	glm::mat4 model;
 	void InitializeSprite();
