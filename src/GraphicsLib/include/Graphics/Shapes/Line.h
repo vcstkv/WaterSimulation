@@ -16,6 +16,7 @@ public:
 	void SetLine(float x1, float y1, float x2, float y2, glm::vec4 *color);
 
 private:
+	void Init();
 	static const int vertexCount = 2;
 	glm::vec4 color;
 	GLuint vertexBuffer;
