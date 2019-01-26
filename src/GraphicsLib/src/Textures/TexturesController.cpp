@@ -1,3 +1,4 @@
+#define GRAPHICS_EXPORTS
 #include "Graphics/Textures/TexturesController.h"
 #include "Graphics/GraphicsResources.h"
 

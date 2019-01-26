@@ -1,3 +1,4 @@
+#define GRAPHICS_EXPORTS
 #include "Graphics/Shaders/SdfTextShaderProgram.h"
 
 SdfTextShaderProgram::SdfTextShaderProgram(const char *vFilePath, const char *fFilePath) 

@@ -1,3 +1,4 @@
+#define GRAPHICS_EXPORTS
 #include "Graphics/Shaders/SpriteShaderProgram.h"
 
 
