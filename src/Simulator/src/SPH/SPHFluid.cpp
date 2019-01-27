@@ -1,9 +1,14 @@
 #include "SPH/SPHFluid.h"
+#include "Graphics/Text/TextFont.h"
 
+
+TextFont *f;
 SPHFluid::SPHFluid(SPHFluidParams &params)
 {
 	this->params = params;
 	particles = new std::vector<SPHParticle>(params.particlesCount);
+	f = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
+	f->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
 	Init();
 }
 
@@ -24,13 +29,13 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 		graphics->DrawCircle(particles->at(i).pos.x,
 							 particles->at(i).pos.y,
 							 params.particleRadius,
-							 params.particleRadius * 0.05,
+							 0.0008,
 							 &glm::vec4(0, 0, 1, 1),
 							 projection,
 							 view);
 	}
 
-	for (uint i = 0; i < particles->size(); i++)
+	/*for (uint i = 0; i < particles->size(); i++)
 	{
 		graphics->DrawLine(particles->at(i).pos.x,
 			particles->at(i).pos.y,
@@ -42,11 +47,12 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 		graphics->DrawCircle(particles->at(i).pos.x,
 							 particles->at(i).pos.y,
 							 params.effectiveRadius,
-							 params.effectiveRadius * 0.05,
+							 0.0008,
 							 &glm::vec4(0, 1, 0, 1),
 							 projection,
 							 view);
-	}
+	}*/
+	f->DrawText(L"density [0]: " + std::to_wstring(particles->at(0).density), 0.035, &glm::vec4(0, 0, 0, 1), 0.03, 0.3, projection);
 }
 
 void SPHFluid::DragParticle(double x, double y, uint particleNum)
@@ -57,6 +63,8 @@ void SPHFluid::DragParticle(double x, double y, uint particleNum)
 	}
 	particles->at(particleNum).pos.x = x;
 	particles->at(particleNum).pos.y = y;
+	particles->at(particleNum).vel.x = 0;
+	particles->at(particleNum).vel.y = 0;
 }
 
 void SPHFluid::Init()
