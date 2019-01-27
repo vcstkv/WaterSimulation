@@ -13,7 +13,6 @@ public:
 	static void UpdatePosition(SPHFluidParams &params, std::vector<SPHParticle> &particles);
 
 private:
-	static double Distance(glm::dvec3 &p1, glm::dvec3 &p2);
 	static double Pressure(SPHFluidParams &params, SPHParticle &p);
 	static glm::dvec3 InternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
 	static glm::dvec3 ExternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
@@ -22,7 +21,7 @@ private:
 	static glm::dvec3 SurfaceTensionForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
 	static glm::dvec3 GravityForce(std::vector<SPHParticle> &particles, uint particleNum);
 
-	static double KernelPoly6(double r, double h);
+	static double KernelPoly6(double r2, double h);
 	static double KernelGradPoly6(double r, double h);
 	static double KernelLaplPoly6(double r, double h);
 	static double KernelPressure(double r, double h);

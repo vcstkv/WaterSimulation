@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include "SPH/SPHSolver.h"
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/norm.hpp"
 #include "cmath"
 
 typedef unsigned int uint;
@@ -22,7 +23,7 @@ void SPHSolver::UpdateDensity(SPHFluidParams &params, std::vector<SPHParticle> &
 			{
 				continue;
 			}*/
-			particles[i].density += params.particleMass * KernelPoly6(Distance(particles[i].pos, particles[j].pos), params.effectiveRadius);
+			particles[i].density += params.particleMass * KernelPoly6(glm::distance2(particles[i].pos, particles[j].pos), params.effectiveRadius);
 
 		}
 	}
@@ -35,25 +36,21 @@ void SPHSolver::UpdatePosition(SPHFluidParams &params, std::vector<SPHParticle> 
 	{
 		oldAcc = particles[i].acc;
 		particles[i].acc = (InternalForces(params, particles, i) /*+ ExternalForces(params, particles, i)*/) / particles[i].density;
-		//particles[i].pos += (particles[i].vel + oldAcc / 2. * params.dt) * params.dt;
-		//particles[i].vel += (particles[i].acc + oldAcc) / 2. * params.dt;	
+		particles[i].pos += (particles[i].vel + oldAcc / 2. * params.dt) * params.dt;
+		particles[i].vel += (particles[i].acc + oldAcc) / 2. * params.dt;	
 	}
-}
-
-double SPHSolver::Distance(glm::dvec3 &p1, glm::dvec3 &p2)
-{
-	return glm::length(p2 - p1);
 }
 
 double SPHSolver::Pressure(SPHFluidParams &params, SPHParticle &p)
 {
-	return params.stiffness * params.stiffness * params.restDensity / 1. * (pow(p.density/params.restDensity, 1.) - 1);
+	return /*params.stiffness * params.stiffness * params.restDensity / 1. * (pow(p.density/params.restDensity, 1.) - 1)*/
+		params.stiffness * params.stiffness * (p.density - params.restDensity);
 }
 
 glm::dvec3 SPHSolver::InternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum)
 {
 	return PressureForce(params, particles, particleNum) 
-		 + ViscosityForce(params, particles, particleNum);
+		 /*+ ViscosityForce(params, particles, particleNum)*/;
 }
 
 glm::dvec3 SPHSolver::ExternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum)
@@ -73,18 +70,17 @@ glm::dvec3 SPHSolver::PressureForce(SPHFluidParams &params, std::vector<SPHParti
 			continue;
 		}
 		double pressure = (Pressure(params, particles[particleNum])
-							/(particles[particleNum].density * particles[particleNum].density) 
-						+ Pressure(params, particles[i])
-							/(particles[i].density * particles[i].density));
+						 + Pressure(params, particles[i]))
+					     / (2. * particles[i].density);
 		double mass = params.particleMass;
-		double kernel = KernelPressure(Distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
-		force += glm::normalize(particles[particleNum].pos - particles[i].pos)
+		double kernel = KernelPressure(glm::distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
+		force += glm::normalize(particles[i].pos - particles[particleNum].pos)
 			* pressure
 			* mass
 			* kernel;
 	}
 
-	return force * -particles[particleNum].density;
+	return force;
 }
 
 glm::dvec3 SPHSolver::ViscosityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum)
@@ -99,7 +95,7 @@ glm::dvec3 SPHSolver::ViscosityForce(SPHFluidParams &params, std::vector<SPHPart
 		}
 		force += (particles[i].vel - particles[particleNum].vel)
 			* params.particleMass / particles[i].density
-			* KernelViscosity(Distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
+			* KernelViscosity(glm::distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
 	}
 
 	return force * params.viscocity / particles[particleNum].density;
@@ -117,9 +113,9 @@ glm::dvec3 SPHSolver::SurfaceTensionForce(SPHFluidParams &params, std::vector<SP
 		}
 		n += glm::normalize(particles[particleNum].pos - particles[i].pos)
 			* params.particleMass / particles[i].density
-			* KernelGradPoly6(Distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
+			* KernelGradPoly6(glm::distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
 		c += params.particleMass / particles[i].density
-			* KernelLaplPoly6(Distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
+			* KernelLaplPoly6(glm::distance(particles[particleNum].pos, particles[i].pos), params.effectiveRadius);
 	}
 	if (glm::length(n) > params.tensionTreshold)
 	{
@@ -135,13 +131,13 @@ glm::dvec3 SPHSolver::GravityForce(std::vector<SPHParticle> &particles, uint par
 }
 
 //Common kernel
-double SPHSolver::KernelPoly6(double r, double h)
+double SPHSolver::KernelPoly6(double r2, double h)
 {
-	if (r < 0 || r > h)
+	if (r2 < 0 || r2 > h * h)
 	{
 		return 0.0;
 	}
-	return 315. / (64. * M_PI * pow(h, 9)) * pow((h * h - r * r), 3);
+	return 4.921875 * M_1_PI / pow(h, 9) * pow((h * h - r2), 3);
 }
 
 double SPHSolver::KernelGradPoly6(double r, double h)

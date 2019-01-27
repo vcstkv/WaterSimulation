@@ -12,7 +12,7 @@ SPHScreen::~SPHScreen()
 SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	scaleCoeff = 0.5f / width;
+	scaleCoeff = 1.5f / width;
 	projection = glm::ortho(0.0f, width * 1.0f * scaleCoeff, 0.0f, height * 1.0f * scaleCoeff, 1.0f, -1.0f);
 	view = glm::mat4(1);//glm::scale(glm::vec3(0.15/width, 0.15/width, 1));
 	SPHFluidParams p;
@@ -24,9 +24,9 @@ SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 	p.surfaceTension = 0.0728;
 	p.tensionTreshold = 7.065;
 	p.particleMass = 0.02;
-	p.particlesCount = 2 * 2;
-	p.effectiveRadius = pow(0.75 * p.particleMass * M_1_PI / p.restDensity * 10, 1./3.);
-	p.particleRadius = pow(0.75 * p.particleMass * M_1_PI / p.restDensity, 1./3.);
+	p.particlesCount = 5 * 5;
+	p.particleRadius = std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
+	p.effectiveRadius = p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
 	fluid = new SPHFluid(p);
 	dragParticle = false;
 }
