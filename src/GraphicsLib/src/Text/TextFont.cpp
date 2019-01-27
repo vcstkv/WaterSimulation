@@ -6,11 +6,11 @@
 #include <fstream>
 
 
-void TextFont::DrawText(std::wstring text, int size, glm::vec4 *color, float x, float y, glm::mat4 *projection)
+void TextFont::DrawText(std::wstring text, double size, glm::vec4 *color, double x, double y, glm::mat4 *projection)
 {
-	scale.x = -size * 1.f / fontSize;
+	scale.x = size * 1.f / fontSize;
 	scale.y = -scale.x;
-	scale.z = scale.y;
+	scale.z = 1;
 	sprite->SetScale(&scale);
 	sprite->SetPosition(x, y);
 	for (uint32_t i = 0, j = 0; i < text.size(); i++)
@@ -22,17 +22,17 @@ void TextFont::DrawText(std::wstring text, int size, glm::vec4 *color, float x, 
 			sprite->Translate(0, -fontSize);
 			continue;
 		}
-		j = text[i] > 1000 ? (text[i] - 945 ): (text[i] - 32);
-		sprite->Translate(glyphs[j].width / 2 * scale.y, -glyphs[j].height / 2 * scale.y);
-		sprite->Translate(glyphs[j].xOffset * scale.y, -glyphs[j].yOffset* scale.y);
+		j = 1 + (text[i] > 1000 ? (text[i] - 945 ) : (text[i] - 32));
+		sprite->Translate(glyphs[j].width / 2 * scale.x, -glyphs[j].height / 2 * scale.x);
+		sprite->Translate(glyphs[j].xOffset * scale.x, -glyphs[j].yOffset* scale.x);
 
 		sprite->SetTextureShape(glyphs[j].x, glyphs[j].y, glyphs[j].width, glyphs[j].height);
 		sprite->SetColor(color);
 		sprite->Draw(projection, &glm::mat4(1));
 
-		sprite->Translate(-glyphs[j].xOffset* scale.y, glyphs[j].yOffset* scale.y);
-		sprite->Translate(-glyphs[j].width / 2 * scale.y, glyphs[j].height / 2 * scale.y);
-		sprite->Translate(glyphs[j].xAdvance * scale.y, 0);
+		sprite->Translate(-glyphs[j].xOffset* scale.x, glyphs[j].yOffset* scale.x);
+		sprite->Translate(-glyphs[j].width / 2 * scale.x, glyphs[j].height / 2 * scale.x);
+		sprite->Translate(glyphs[j].xAdvance * scale.x, 0);
 	}
 }
 

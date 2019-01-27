@@ -21,7 +21,7 @@ struct Glyph
 class TextFont
 {
 public:
-	GRAPHICS_API void DrawText(std::wstring text, int size, glm::vec4 *color, float x, float y, glm::mat4 *projection);
+	GRAPHICS_API void DrawText(std::wstring text, double size, glm::vec4 *color, double x, double y, glm::mat4 *projection);
 	GRAPHICS_API TextFont(char* filePath);
 	GRAPHICS_API ~TextFont();
 	GRAPHICS_API void AddParamValue(glm::vec4 *delta);
