@@ -18,9 +18,12 @@ public:
 	void Update(double delta);
 	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);
 	void DragParticle(double x, double y, uint particleNum);
+	void SetBoundaryBox(BoundaryBox &box);
 	void Init();
+	void AddParticle(double x, double y, double z);
 private:
 	SPHFluidParams params;
+	BoundaryBox boundaryBox;
 	std::vector<SPHParticle> *particles;
 };
 

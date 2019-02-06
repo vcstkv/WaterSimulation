@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 typedef unsigned int uint;
 
 struct SPHFluidParams
@@ -14,6 +16,20 @@ struct SPHFluidParams
 	double stiffness;
 	double dt;
 	double particleRadius;
+	double distanceThreshold;
+	double maxAcc;
+	double maxVel;
+	uint avgKernelParticles;
 	unsigned int particlesCount;
 	
 };
+
+typedef struct
+{
+	double xMin;
+	double xMax;
+	double yMin;
+	double yMax;
+	double zMin;
+	double zMax;
+} BoundaryBox;

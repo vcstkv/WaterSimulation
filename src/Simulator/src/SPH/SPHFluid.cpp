@@ -20,6 +20,7 @@ SPHFluid::~SPHFluid()
 void SPHFluid::Update(double delta)
 {
 	SPHSolver::Advect(params, *particles);
+	SPHSolver::UseBoundary(boundaryBox, *particles);
 }
 
 void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view)
@@ -51,8 +52,8 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 							 &glm::vec4(0, 1, 0, 1),
 							 projection,
 							 view);
-	}*/
-	f->DrawText(L"density [0]: " + std::to_wstring(particles->at(0).density), 0.035, &glm::vec4(0, 0, 0, 1), 0.03, 0.3, projection);
+	}
+	f->DrawText(L"density [0]: " + std::to_wstring(particles->at(0).density), 0.035, &glm::vec4(0, 0, 0, 1), 0.03, 0.3, projection);*/
 }
 
 void SPHFluid::DragParticle(double x, double y, uint particleNum)
@@ -67,13 +68,22 @@ void SPHFluid::DragParticle(double x, double y, uint particleNum)
 	particles->at(particleNum).vel.y = 0;
 }
 
+void SPHFluid::SetBoundaryBox(BoundaryBox & box)
+{
+	boundaryBox = box;
+}
+
 void SPHFluid::Init()
 {
-	uint initGridSize = static_cast<uint>(sqrt(particles->size()));
+	uint initGridSize = static_cast<uint>(ceil(sqrt(particles->size())));
 	for (uint i = 0; i < initGridSize; i++)
 	{
 		for (uint j = 0; j < initGridSize; j++)
 		{
+			if (initGridSize * i + j >= particles->size())
+			{
+				return;
+			}
 			particles->at(initGridSize * i + j).pos = 
 				glm::dvec3
 				(
@@ -86,4 +96,16 @@ void SPHFluid::Init()
 			particles->at(initGridSize * i + j).density = 0.;
 		}
 	}
+}
+
+void SPHFluid::AddParticle(double x, double y, double z)
+{
+	SPHParticle p;
+	p.pos.x = x;
+	p.pos.y = y;
+	p.pos.z = z;
+	p.vel = glm::dvec3(0.);
+	p.acc = glm::dvec3(0.);
+	p.density = 0.;
+	particles->push_back(p);
 }
