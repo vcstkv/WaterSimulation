@@ -1,48 +1,188 @@
 #define _USE_MATH_DEFINES
 #include "Screens/SPHScreen.h"
+#include "GUI/Controlls/Slider.h"
 #include <cmath>
+#include "Graphics/Text/TextFont.h"
 
 
 
 bool emitParticles = false;
 glm::dvec2 cursorPos(0);
+glm::mat4 guiview;
+TextFont *fnt;
+SPHFluidParams p;
+
+Slider *restDensitySlider;
+Slider *viscositySlider;
+Slider *stiffnessSlider;
+Slider *surfaceTensionSlider;
+Slider *massSlider;
+Slider *maxVelSlider;
+Slider *maxAccSlider;
+
+struct ParamSliderData
+{
+	SPHFluidParams *p;
+	SPHFluid *f;
+};
+
+ParamSliderData sd;
+
 SPHScreen::~SPHScreen()
 {
+	delete restDensitySlider;
+	delete viscositySlider;
+	delete stiffnessSlider;
+	delete surfaceTensionSlider;
+	delete massSlider;
+	delete maxVelSlider;
+	delete maxAccSlider;
 }
 
 SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	scaleCoeff = 0.2f / width;
-	projection = glm::ortho(0.0f, width * 1.0f * scaleCoeff, 0.0f, height * 1.0f * scaleCoeff, 1.0f, -1.0f);
-	view = glm::mat4(1);//glm::scale(glm::vec3(0.15/width, 0.15/width, 1));
-	SPHFluidParams p;
-	p.restDensity = 1000;
+	scaleCoeff = width / 1.8f;
+	projection = glm::ortho(0.0f, width * 1.0f /** scaleCoeff*/, 0.0f, height * 1.0f /** scaleCoeff*/, 1.0f, -1.0f);
+	view = /*glm::mat4(1);*/glm::scale(glm::vec3(scaleCoeff, scaleCoeff, 1));
+	guiview = glm::mat4(1);
+	p.restDensity = 200;
 	p.restPressure = 0.001;
-	p.viscocity = 35;
-	p.dt = 0.005;
-	p.stiffness = 1.5;//0.3;//3.5;
-	p.surfaceTension = 0.0728;
-	p.avgKernelParticles = 10;
-	p.maxAcc = 75;
-	p.maxVel = 5;
+	p.viscocity = 0.5;
+	p.dt = 0.01;
+	p.stiffness = 3.5;//0.3;//3.5;
+	p.surfaceTension = 0.728;
+	p.avgKernelParticles = 20;
+	p.maxAcc = 100;
+	p.maxVel = 0.8;
 	p.tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
-	p.particleMass = 0.02;
-	p.particlesCount = 0;
-	p.particleRadius = sqrt(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
-	p.effectiveRadius = sqrt(p.avgKernelParticles * p.particleMass * M_1_PI / p.restDensity);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
+	p.particleMass = 0.5;
+	p.particlesCount = 200;
+	p.particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
+	p.effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius/** p.particleMass * M_1_PI / p.restDensity*/);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
 	fluid = new SPHFluid(p);
 	BoundaryBox box = 
 	{ 
 		p.particleRadius, 
-		width * scaleCoeff - p.particleRadius,
+		width / scaleCoeff - p.particleRadius,
 		p.particleRadius,
-		height * scaleCoeff - p.particleRadius,
+		height / scaleCoeff - p.particleRadius,
 		0., 
 		0. 
 	};
 	fluid->SetBoundaryBox(box);
 	dragParticle = false;
+	fnt = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
+	fnt->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
+
+	sd.f = fluid;
+	sd.p = &p;
+
+	restDensitySlider = new Slider(200, height - 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	viscositySlider = new Slider(200, height - 2 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	stiffnessSlider = new Slider(200, height - 3 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	surfaceTensionSlider = new Slider(200, height - 4 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	massSlider = new Slider(200, height - 5 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	maxVelSlider = new Slider(200, height - 6 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	maxAccSlider = new Slider(200, height - 7 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+
+	restDensitySlider->SetRange(0.017, 1000);
+	viscositySlider->SetRange(0.001, 100);
+	stiffnessSlider->SetRange(0.01, 20);
+	surfaceTensionSlider->SetRange(0.001, 30);
+	massSlider->SetRange(0.001, 3);
+	maxVelSlider->SetRange(0.1, 100);
+	maxAccSlider->SetRange(1, 200);
+
+	restDensitySlider->SetValue(p.restDensity);
+	viscositySlider->SetValue(p.viscocity);
+	stiffnessSlider->SetValue(p.stiffness);
+	surfaceTensionSlider->SetValue(p.surfaceTension);
+	massSlider->SetValue(p.particleMass);
+	maxVelSlider->SetValue(p.maxVel);
+	maxAccSlider->SetValue(p.maxAcc);;
+
+	restDensitySlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->restDensity = value;
+		sd->p->particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);
+		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	viscositySlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->viscocity = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	stiffnessSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->stiffness = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	surfaceTensionSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->surfaceTension = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	massSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->particleMass = value;
+		sd->p->particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);
+		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	maxVelSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->maxVel = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	maxAccSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->maxAcc = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
 }
 
 void SPHScreen::Update(float delta)
@@ -58,15 +198,36 @@ void SPHScreen::Render(Graphics *graphics)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	fluid->Render(graphics, &projection, &view);
-	//std::cout << glGetError() << std::endl;
+	fnt->DrawText(L"density: " + std::to_wstring(restDensitySlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 50 + 24 + 10, &projection);
+	restDensitySlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"viscosity: " + std::to_wstring(viscositySlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 2 * 50 + 24 + 10, &projection);
+	viscositySlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"stiffness: " + std::to_wstring(stiffnessSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 3 * 50 + 24 + 10, &projection);
+	stiffnessSlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"sTension: " + std::to_wstring(surfaceTensionSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 4 * 50 + 24 + 10, &projection);
+	surfaceTensionSlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"mass: " + std::to_wstring(massSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 5 * 50 + 24 + 10, &projection);
+	massSlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"maxVel: " + std::to_wstring(maxVelSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 6 * 50 + 24 + 10, &projection);
+	maxVelSlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"maxAcc: " + std::to_wstring(maxAccSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 7 * 50 + 24 + 10, &projection);
+	maxAccSlider->Draw(graphics, &projection, &guiview);
 }
 
 void SPHScreen::OnMouseButtonEvent(int btn, int action, int mods)
 {
+	restDensitySlider->OnMouseButtonEvent(btn, action, mods);
+	viscositySlider->OnMouseButtonEvent(btn, action, mods);
+	stiffnessSlider->OnMouseButtonEvent(btn, action, mods);
+	surfaceTensionSlider->OnMouseButtonEvent(btn, action, mods);
+	massSlider->OnMouseButtonEvent(btn, action, mods);
+	maxVelSlider->OnMouseButtonEvent(btn, action, mods);
+	maxAccSlider->OnMouseButtonEvent(btn, action, mods);
+
 	switch (btn)
 	{
 	case GLFW_MOUSE_BUTTON_LEFT:
-		dragParticle = action == GLFW_PRESS;
+		//dragParticle = action == GLFW_PRESS;
 		break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
 		emitParticles = action == GLFW_PRESS;
@@ -80,8 +241,16 @@ void SPHScreen::OnMouseButtonEvent(int btn, int action, int mods)
 
 void SPHScreen::OnMouseCursorEvent(double x, double y)
 {
-	cursorPos.x = x * scaleCoeff;
-	cursorPos.y = (height - y) * scaleCoeff;
+	restDensitySlider->OnMouseCursorEvent(x, height - y);
+	viscositySlider->OnMouseCursorEvent(x, height - y);
+	stiffnessSlider->OnMouseCursorEvent(x, height - y);
+	surfaceTensionSlider->OnMouseCursorEvent(x, height - y);
+	massSlider->OnMouseCursorEvent(x, height - y);
+	maxVelSlider->OnMouseCursorEvent(x, height - y);
+	maxAccSlider->OnMouseCursorEvent(x, height - y);
+
+	cursorPos.x = x / scaleCoeff;
+	cursorPos.y = (height - y) / scaleCoeff;
 
 	if (dragParticle)
 	{

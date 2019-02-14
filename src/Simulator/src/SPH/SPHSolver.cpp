@@ -39,7 +39,7 @@ void SPHSolver::UpdatePosition(SPHFluidParams &params, std::vector<SPHParticle> 
 	for (uint i = 0; i < particles.size(); i++)
 	{
 		oldAcc = particles[i].acc;
-		particles[i].acc = InternalForces(params, particles, i) / particles[i].density  + ExternalForces(params, particles, i) / params.particleMass;
+		particles[i].acc = (InternalForces(params, particles, i) + ExternalForces(params, particles, i)) / particles[i].density; //+ ExternalForces(params, particles, i) / params.particleMass;
 		magnitude = glm::length(particles[i].acc);
 		if (magnitude > params.maxAcc)
 		{
@@ -60,7 +60,7 @@ void SPHSolver::UseBoundary(BoundaryBox &box, std::vector<SPHParticle> &p)
 	for (uint i = 0; i < p.size(); i++)
 	{
 		double eps = 0.000;
-		float d = 0.3;
+		float d = 0.6;
 		if (p[i].pos.x < box.xMin) 
 		{
 			p[i].pos = glm::dvec3(box.xMin + eps, p[i].pos.y, p[i].pos.z);
@@ -172,7 +172,7 @@ glm::dvec3 SPHSolver::SurfaceTensionForce(SPHFluidParams &params, std::vector<SP
 
 glm::dvec3 SPHSolver::GravityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum)
 {
-	return glm::dvec3(0., -9.8, 0.) * params.particleMass;//particles[particleNum].density;
+	return glm::dvec3(0., -9.8, 0.) * particles[particleNum].density;
 }
 
 //Common kernel

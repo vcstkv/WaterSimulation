@@ -29,21 +29,21 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 	{
 		graphics->DrawCircle(particles->at(i).pos.x,
 							 particles->at(i).pos.y,
-							 params.particleRadius,
-							 0.0008,
+							 /*0.8 * params.effectiveRadius*/params.particleRadius,
+							 /*0.8 * params.effectiveRadius*/0.0008,
 							 &glm::vec4(0, 0, 1, 1),
 							 projection,
 							 view);
 	}
 
-	/*for (uint i = 0; i < particles->size(); i++)
+	for (uint i = 0; i < particles->size(); i++)
 	{
-		graphics->DrawLine(particles->at(i).pos.x,
+		/*graphics->DrawLine(particles->at(i).pos.x,
 			particles->at(i).pos.y,
 			particles->at(i).pos.x + particles->at(i).acc.x,
 			particles->at(i).pos.y + particles->at(i).acc.y,
 			&glm::vec4(1, 0, 0, 1),
-			projection);
+			projection);*/
 
 		graphics->DrawCircle(particles->at(i).pos.x,
 							 particles->at(i).pos.y,
@@ -53,7 +53,7 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 							 projection,
 							 view);
 	}
-	f->DrawText(L"density [0]: " + std::to_wstring(particles->at(0).density), 0.035, &glm::vec4(0, 0, 0, 1), 0.03, 0.3, projection);*/
+	//f->DrawText(L"density [0]: " + std::to_wstring(particles->at(0).density), 24, &glm::vec4(0, 0, 0, 1), 100, 500, projection);
 }
 
 void SPHFluid::DragParticle(double x, double y, uint particleNum)
@@ -71,6 +71,11 @@ void SPHFluid::DragParticle(double x, double y, uint particleNum)
 void SPHFluid::SetBoundaryBox(BoundaryBox & box)
 {
 	boundaryBox = box;
+}
+
+void SPHFluid::AdjustParams(SPHFluidParams &params)
+{
+	this->params = params;
 }
 
 void SPHFluid::Init()
@@ -104,7 +109,7 @@ void SPHFluid::AddParticle(double x, double y, double z)
 	p.pos.x = x;
 	p.pos.y = y;
 	p.pos.z = z;
-	p.vel = glm::dvec3(0.);
+	p.vel = glm::dvec3(0.8, -0.8, 0.);
 	p.acc = glm::dvec3(0.);
 	p.density = 0.;
 	particles->push_back(p);

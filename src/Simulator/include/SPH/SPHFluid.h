@@ -19,6 +19,7 @@ public:
 	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);
 	void DragParticle(double x, double y, uint particleNum);
 	void SetBoundaryBox(BoundaryBox &box);
+	void AdjustParams(SPHFluidParams& params);
 	void Init();
 	void AddParticle(double x, double y, double z);
 private:
