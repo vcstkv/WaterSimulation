@@ -57,7 +57,7 @@ void MainScreen::Render(Graphics *graphics)
 			grass->Draw(&projection, &view);
 		}
 	}
-	graphics->DrawLine(400, 400, 0, 0, &vec4(1, 1, 0, 1), &projection);
+	graphics->DrawLine(400, 400, 0, 0, 1.0, &vec4(1, 1, 0, 1), &projection);
 	font->DrawText(L"Jdg12", textSize, &vec4(0, 0, 0, 1), 0, 600, &projection);
 	btn->Draw(&projection, &view);
 	//std::cout << glGetError() << std::endl;

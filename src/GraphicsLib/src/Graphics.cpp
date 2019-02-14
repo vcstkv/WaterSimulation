@@ -37,9 +37,9 @@ Graphics::~Graphics()
 	//delete sagoePrintFont;
 }
 
-void Graphics::DrawLine(float x1, float y1, float x2, float y2, glm::vec4 *color, glm::mat4 *projection)
+void Graphics::DrawLine(float x1, float y1, float x2, float y2, float width, glm::vec4 *color, glm::mat4 *projection)
 {
-	line->SetLine(x1, y1, x2, y2, color);
+	line->SetLine(x1, y1, x2, y2, width, color);
 	line->Draw(projection);
 }
 
