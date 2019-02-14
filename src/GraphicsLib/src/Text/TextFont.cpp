@@ -51,7 +51,7 @@ TextFont::~TextFont()
 
 void TextFont::ShowInfo()
 {
-	printf("\nTexture size:%dx%d", sprite->width, sprite->height);
+	printf("\nTexture size:%fx%f", sprite->width, sprite->height);
 	for (unsigned int i = 0; i < glyphsCount; i++)
 	{
 		printf("\nGlyph %d id:%d, x:%d, y:%d, w:%d, h:%d", i, glyphs[i].id, glyphs[i].x, glyphs[i].y, glyphs[i].width, glyphs[i].height);
