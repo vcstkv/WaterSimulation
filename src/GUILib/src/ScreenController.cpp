@@ -60,7 +60,7 @@ ScreenController::ScreenController(int screenWidth, int screenHeight, std::strin
 
 ScreenController::~ScreenController()
 {
-	for (int i = 0; i < screens->size(); i++)
+	for (unsigned int i = 0; i < screens->size(); i++)
 	{
 		delete (*screens)[i];
 	}
