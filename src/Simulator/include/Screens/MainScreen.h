@@ -1,6 +1,6 @@
 #pragma once
 #include "GUI/Screen.h"
-#include "GUI/Button.h"
+#include "GUI/Controlls/Button.h"
 
 class MainScreen :
 	public Screen
