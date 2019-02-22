@@ -19,6 +19,7 @@ Slider *surfaceTensionSlider;
 Slider *massSlider;
 Slider *maxVelSlider;
 Slider *maxAccSlider;
+Slider *avgKernelParticlesSlider;
 
 struct ParamSliderData
 {
@@ -42,21 +43,21 @@ SPHScreen::~SPHScreen()
 SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	scaleCoeff = width / 1.8f;
+	scaleCoeff = width / .8f;
 	projection = glm::ortho(0.0f, width * 1.0f /** scaleCoeff*/, 0.0f, height * 1.0f /** scaleCoeff*/, 1.0f, -1.0f);
 	view = /*glm::mat4(1);*/glm::scale(glm::vec3(scaleCoeff, scaleCoeff, 1));
 	guiview = glm::mat4(1);
-	p.restDensity = 200;
+	p.restDensity = 1000;
 	p.restPressure = 0.001;
-	p.viscocity = 0.5;
-	p.dt = 0.01;
-	p.stiffness = 3.5;//0.3;//3.5;
+	p.viscocity = 41;
+	p.dt = 0.001;
+	p.stiffness = 8;//0.3;//3.5;
 	p.surfaceTension = 0.728;
 	p.avgKernelParticles = 20;
 	p.maxAcc = 100;
 	p.maxVel = 0.8;
 	p.tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
-	p.particleMass = 0.5;
+	p.particleMass = 0.009;
 	p.particlesCount = 200;
 	p.particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
 	p.effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius/** p.particleMass * M_1_PI / p.restDensity*/);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
@@ -85,6 +86,7 @@ SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 	massSlider = new Slider(200, height - 5 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 	maxVelSlider = new Slider(200, height - 6 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 	maxAccSlider = new Slider(200, height - 7 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	avgKernelParticlesSlider = new Slider(200, height - 8 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 
 	restDensitySlider->SetRange(0.017, 1000);
 	viscositySlider->SetRange(0.001, 100);
@@ -93,6 +95,7 @@ SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 	massSlider->SetRange(0.001, 3);
 	maxVelSlider->SetRange(0.1, 100);
 	maxAccSlider->SetRange(1, 200);
+	avgKernelParticlesSlider->SetRange(1, 100);
 
 	restDensitySlider->SetValue(p.restDensity);
 	viscositySlider->SetValue(p.viscocity);
@@ -100,7 +103,8 @@ SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 	surfaceTensionSlider->SetValue(p.surfaceTension);
 	massSlider->SetValue(p.particleMass);
 	maxVelSlider->SetValue(p.maxVel);
-	maxAccSlider->SetValue(p.maxAcc);;
+	maxAccSlider->SetValue(p.maxAcc);
+	avgKernelParticlesSlider->SetValue(p.avgKernelParticles);
 
 	restDensitySlider->SetCallback(
 	[](double value, void *data)
@@ -183,6 +187,19 @@ SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 		sd->p->maxAcc = value;
 		sd->f->AdjustParams(*sd->p);
 	}, &sd);
+	avgKernelParticlesSlider->SetCallback(
+	[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->avgKernelParticles = value;
+		sd->p->tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
+		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
 }
 
 void SPHScreen::Update(float delta)
@@ -212,6 +229,8 @@ void SPHScreen::Render(Graphics *graphics)
 	maxVelSlider->Draw(graphics, &projection, &guiview);
 	fnt->DrawText(L"maxAcc: " + std::to_wstring(maxAccSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 7 * 50 + 24 + 10, &projection);
 	maxAccSlider->Draw(graphics, &projection, &guiview);
+	fnt->DrawText(L"avgKerParticles: " + std::to_wstring(avgKernelParticlesSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 8 * 50 + 24 + 10, &projection);
+	avgKernelParticlesSlider->Draw(graphics, &projection, &guiview);
 }
 
 void SPHScreen::OnMouseButtonEvent(int btn, int action, int mods)
@@ -223,6 +242,7 @@ void SPHScreen::OnMouseButtonEvent(int btn, int action, int mods)
 	massSlider->OnMouseButtonEvent(btn, action, mods);
 	maxVelSlider->OnMouseButtonEvent(btn, action, mods);
 	maxAccSlider->OnMouseButtonEvent(btn, action, mods);
+	avgKernelParticlesSlider->OnMouseButtonEvent(btn, action, mods);
 
 	switch (btn)
 	{
@@ -248,6 +268,7 @@ void SPHScreen::OnMouseCursorEvent(double x, double y)
 	massSlider->OnMouseCursorEvent(x, height - y);
 	maxVelSlider->OnMouseCursorEvent(x, height - y);
 	maxAccSlider->OnMouseCursorEvent(x, height - y);
+	avgKernelParticlesSlider->OnMouseCursorEvent(x, height - y);
 
 	cursorPos.x = x / scaleCoeff;
 	cursorPos.y = (height - y) / scaleCoeff;
