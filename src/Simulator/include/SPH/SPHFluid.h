@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "SPHParticle.h"
-#include "SPHSolver.h"
+#include "SPHGPUSolver.h"
 #include "SPHFluidParams.h"
 #include "Graphics/Shapes/Sprites/CommonSprite.h"
 #include "Graphics/Graphics.h"
@@ -15,15 +15,16 @@ class SPHFluid
 public:
 	SPHFluid(SPHFluidParams &params);
 	~SPHFluid();
-	void Update(double delta);
+	void Update(float delta);
 	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);
-	void DragParticle(double x, double y, uint particleNum);
+	void DragParticle(float x, float y, uint particleNum);
 	void SetBoundaryBox(BoundaryBox &box);
 	void AdjustParams(SPHFluidParams& params);
 	void Init();
-	void AddParticle(double x, double y, double z);
+	void AddParticle(float x, float y, float z);
 private:
 	SPHFluidParams params;
+	SPHGPUSolver *solver;
 	BoundaryBox boundaryBox;
 	std::vector<SPHParticle> *particles;
 };

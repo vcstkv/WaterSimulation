@@ -21,6 +21,8 @@ Slider *maxVelSlider;
 Slider *maxAccSlider;
 Slider *avgKernelParticlesSlider;
 
+
+
 struct ParamSliderData
 {
 	SPHFluidParams *p;
@@ -43,171 +45,18 @@ SPHScreen::~SPHScreen()
 SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	scaleCoeff = width / .8f;
-	projection = glm::ortho(0.0f, width * 1.0f /** scaleCoeff*/, 0.0f, height * 1.0f /** scaleCoeff*/, 1.0f, -1.0f);
+	scaleCoeff = width / 0.8f;
+	projection = glm::ortho(0.0f, width * 1.0f, 0.0f, height * 1.0f, 1.0f, -1.0f);
 	view = /*glm::mat4(1);*/glm::scale(glm::vec3(scaleCoeff, scaleCoeff, 1));
 	guiview = glm::mat4(1);
-	p.restDensity = 1000;
-	p.restPressure = 0.001;
-	p.viscocity = 41;
-	p.dt = 0.001;
-	p.stiffness = 8;//0.3;//3.5;
-	p.surfaceTension = 0.728;
-	p.avgKernelParticles = 20;
-	p.maxAcc = 100;
-	p.maxVel = 0.8;
-	p.tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
-	p.particleMass = 0.009;
-	p.particlesCount = 200;
-	p.particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
-	p.effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius/** p.particleMass * M_1_PI / p.restDensity*/);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
-	fluid = new SPHFluid(p);
-	BoundaryBox box = 
-	{ 
-		p.particleRadius, 
-		width / scaleCoeff - p.particleRadius,
-		p.particleRadius,
-		height / scaleCoeff - p.particleRadius,
-		0., 
-		0. 
-	};
-	fluid->SetBoundaryBox(box);
-	dragParticle = false;
-	fnt = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
-	fnt->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
-
-	sd.f = fluid;
-	sd.p = &p;
-
-	restDensitySlider = new Slider(200, height - 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	viscositySlider = new Slider(200, height - 2 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	stiffnessSlider = new Slider(200, height - 3 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	surfaceTensionSlider = new Slider(200, height - 4 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	massSlider = new Slider(200, height - 5 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	maxVelSlider = new Slider(200, height - 6 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	maxAccSlider = new Slider(200, height - 7 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-	avgKernelParticlesSlider = new Slider(200, height - 8 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
-
-	restDensitySlider->SetRange(0.017, 1000);
-	viscositySlider->SetRange(0.001, 100);
-	stiffnessSlider->SetRange(0.01, 20);
-	surfaceTensionSlider->SetRange(0.001, 30);
-	massSlider->SetRange(0.001, 3);
-	maxVelSlider->SetRange(0.1, 100);
-	maxAccSlider->SetRange(1, 200);
-	avgKernelParticlesSlider->SetRange(1, 100);
-
-	restDensitySlider->SetValue(p.restDensity);
-	viscositySlider->SetValue(p.viscocity);
-	stiffnessSlider->SetValue(p.stiffness);
-	surfaceTensionSlider->SetValue(p.surfaceTension);
-	massSlider->SetValue(p.particleMass);
-	maxVelSlider->SetValue(p.maxVel);
-	maxAccSlider->SetValue(p.maxAcc);
-	avgKernelParticlesSlider->SetValue(p.avgKernelParticles);
-
-	restDensitySlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->restDensity = value;
-		sd->p->particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);
-		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	viscositySlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->viscocity = value;
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	stiffnessSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->stiffness = value;
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	surfaceTensionSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->surfaceTension = value;
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	massSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->particleMass = value;
-		sd->p->particleRadius = 1.5 * sqrt(p.particleMass * M_1_PI / p.restDensity);
-		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	maxVelSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->maxVel = value;
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	maxAccSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->maxAcc = value;
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
-	avgKernelParticlesSlider->SetCallback(
-	[](double value, void *data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		ParamSliderData *sd = (ParamSliderData*)data;
-		sd->p->avgKernelParticles = value;
-		sd->p->tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
-		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
-		sd->f->AdjustParams(*sd->p);
-	}, &sd);
 }
 
 void SPHScreen::Update(float delta)
 {
-	if (emitParticles)
+	/*if (emitParticles)
 	{
 		fluid->AddParticle(cursorPos.x, cursorPos.y, 0.);
-	}
+	}*/
 	fluid->Update(delta);
 }
 
@@ -388,5 +237,157 @@ void SPHScreen::OnKeyRelease(int buttonID)
 
 void SPHScreen::Initialize()
 {
+	p.restDensity = 1000.f;
+	p.restPressure = 0.001f;
+	p.viscocity = 141.f;
+	p.dt = 0.0005f;
+	p.stiffness = 0.3f;//0.3;//3.5;
+	p.surfaceTension = 0.728f;
+	p.avgKernelParticles = 20;
+	p.maxAcc = 100.f;
+	p.maxVel = 0.8f;
+	p.tensionTreshold = sqrtf(p.restDensity / p.avgKernelParticles);
+	p.particleMass = 0.02f;
+	p.particlesCount = 4096;
+	p.particleRadius = sqrtf(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
+	p.effectiveRadius = sqrtf(p.avgKernelParticles * p.particleRadius * p.particleRadius/** p.particleMass * M_1_PI / p.restDensity*/);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
+	fluid = new SPHFluid(p);
+	BoundaryBox box =
+	{
+		p.particleRadius,
+		width / scaleCoeff - p.particleRadius,
+		p.particleRadius,
+		height / scaleCoeff - p.particleRadius,
+		0.,
+		0.
+	};
+	fluid->SetBoundaryBox(box);
+	dragParticle = false;
+	fnt = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
+	fnt->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
 
+	sd.f = fluid;
+	sd.p = &p;
+
+	restDensitySlider = new Slider(200, height - 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	viscositySlider = new Slider(200, height - 2 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	stiffnessSlider = new Slider(200, height - 3 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	surfaceTensionSlider = new Slider(200, height - 4 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	massSlider = new Slider(200, height - 5 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	maxVelSlider = new Slider(200, height - 6 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	maxAccSlider = new Slider(200, height - 7 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+	avgKernelParticlesSlider = new Slider(200, height - 8 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
+
+	restDensitySlider->SetRange(0.017, 1000);
+	viscositySlider->SetRange(0.001, 100);
+	stiffnessSlider->SetRange(0.01, 20);
+	surfaceTensionSlider->SetRange(0.001, 30);
+	massSlider->SetRange(0.001, 3);
+	maxVelSlider->SetRange(0.1, 100);
+	maxAccSlider->SetRange(1, 200);
+	avgKernelParticlesSlider->SetRange(1, 100);
+
+	restDensitySlider->SetValue(p.restDensity);
+	viscositySlider->SetValue(p.viscocity);
+	stiffnessSlider->SetValue(p.stiffness);
+	surfaceTensionSlider->SetValue(p.surfaceTension);
+	massSlider->SetValue(p.particleMass);
+	maxVelSlider->SetValue(p.maxVel);
+	maxAccSlider->SetValue(p.maxAcc);
+	avgKernelParticlesSlider->SetValue(p.avgKernelParticles);
+
+	restDensitySlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->restDensity = value;
+		sd->p->particleRadius = sqrtf(p.particleMass * M_1_PI / p.restDensity);
+		sd->p->effectiveRadius = sqrtf(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	viscositySlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->viscocity = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	stiffnessSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->stiffness = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	surfaceTensionSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->surfaceTension = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	massSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->particleMass = value;
+		sd->p->particleRadius = sqrtf(p.particleMass * M_1_PI / p.restDensity);
+		sd->p->effectiveRadius = sqrtf(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	maxVelSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->maxVel = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	maxAccSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->maxAcc = value;
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
+	avgKernelParticlesSlider->SetCallback(
+		[](double value, void *data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		ParamSliderData *sd = (ParamSliderData*)data;
+		sd->p->avgKernelParticles = value;
+		sd->p->tensionTreshold = sqrt(p.restDensity / p.avgKernelParticles);
+		sd->p->effectiveRadius = sqrt(p.avgKernelParticles * p.particleRadius * p.particleRadius);
+		sd->f->AdjustParams(*sd->p);
+	}, &sd);
 }

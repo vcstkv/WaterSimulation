@@ -13,18 +13,18 @@ public:
 	static void UpdatePosition(SPHFluidParams &params, std::vector<SPHParticle> &particles);
 	static void UseBoundary(BoundaryBox &box, std::vector<SPHParticle> &p);
 private:
-	static double Pressure(SPHFluidParams &params, SPHParticle &p);
-	static glm::dvec3 InternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
-	static glm::dvec3 ExternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
-	static glm::dvec3 PressureForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
-	static glm::dvec3 ViscosityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
-	static glm::dvec3 SurfaceTensionForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
-	static glm::dvec3 GravityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static float Pressure(SPHFluidParams &params, SPHParticle &p);
+	static glm::vec2 InternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static glm::vec2 ExternalForces(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static glm::vec2 PressureForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static glm::vec2 ViscosityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static glm::vec2 SurfaceTensionForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
+	static glm::vec2 GravityForce(SPHFluidParams &params, std::vector<SPHParticle> &particles, uint particleNum);
 
-	static double KernelPoly6(double r2, double h);
-	static glm::dvec3 KernelGradPoly6(glm::dvec3 &r, double h);
-	static double KernelLaplPoly6(double r, double h);
-	static glm::dvec3 KernelPressure(glm::dvec3 &r, double h);
-	static double KernelViscosity(double r, double h);
+	static float KernelPoly6(float r2, float h);
+	static glm::vec2 KernelGradPoly6(glm::vec2 &r, float h);
+	static float KernelLaplPoly6(float r, float h);
+	static glm::vec2 KernelPressure(glm::vec2 &r, float h);
+	static float KernelViscosity(float r, float h);
 };
 

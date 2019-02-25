@@ -124,3 +124,12 @@ bool ShaderProgram::Link()
 	printf(" OK!\n");
 	return true;
 }
+
+GLint ShaderProgram::GetUniformLocation(const GLchar *name)
+{
+	if (id <= 0)
+	{
+		return 0;
+	}
+	return glGetUniformLocation(id, name);
+}

@@ -4,9 +4,13 @@
 
 struct SPHParticle
 {
-	glm::dvec3 pos;
-	glm::dvec3 vel;
-	glm::dvec3 acc;
-	double density;
+	glm::vec2 pos;
+	glm::vec2 vel;
+	glm::vec2 force;
+	glm::vec2 prevForce;
+	float pressure;
+	float density;
+	float mass;
+	float _;
 };
 

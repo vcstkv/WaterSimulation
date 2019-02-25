@@ -1,27 +1,24 @@
 #pragma once
 
-
-
 typedef unsigned int uint;
 
 struct SPHFluidParams
 {
-	double viscocity;
-	double particleMass;
-	double restPressure;
-	double restDensity;
-	double effectiveRadius;
-	double surfaceTension;
-	double tensionTreshold;
-	double stiffness;
-	double dt;
-	double particleRadius;
-	double distanceThreshold;
-	double maxAcc;
-	double maxVel;
+	float viscocity;
+	float particleMass;
+	float restPressure;
+	float restDensity;
+	float effectiveRadius;
+	float surfaceTension;
+	float tensionTreshold;
+	float stiffness;
+	float dt;
+	float particleRadius;
+	float distanceThreshold;
+	float maxAcc;
+	float maxVel;
 	uint avgKernelParticles;
 	unsigned int particlesCount;
-	
 };
 
 typedef struct

@@ -16,6 +16,7 @@ public:
 	GRAPHICS_API void Disable();
 	GRAPHICS_API bool AddShader(GLenum type, const char* fileName);
 	GRAPHICS_API bool Link();
+	GRAPHICS_API GLint GetUniformLocation(const GLchar* name);
 	GRAPHICS_API ~ShaderProgram();
 protected:
 	GLuint id;
