@@ -80,6 +80,7 @@ void SPHScreen::Render(Graphics *graphics)
 	maxAccSlider->Draw(graphics, &projection, &guiview);
 	fnt->DrawText(L"avgKerParticles: " + std::to_wstring(avgKernelParticlesSlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 8 * 50 + 24 + 10, &projection);
 	avgKernelParticlesSlider->Draw(graphics, &projection, &guiview);
+	//printf("err: %d", glError)
 }
 
 void SPHScreen::OnMouseButtonEvent(int btn, int action, int mods)
@@ -241,9 +242,9 @@ void SPHScreen::Initialize()
 	p.restPressure = 0.001f;
 	p.viscocity = 141.f;
 	p.dt = 0.0005f;
-	p.stiffness = 0.3f;//0.3;//3.5;
+	p.stiffness = 2.7f;//0.3;//3.5;
 	p.surfaceTension = 0.728f;
-	p.avgKernelParticles = 20;
+	p.avgKernelParticles = 30;
 	p.maxAcc = 100.f;
 	p.maxVel = 0.8f;
 	p.tensionTreshold = sqrtf(p.restDensity / p.avgKernelParticles);
@@ -279,7 +280,7 @@ void SPHScreen::Initialize()
 	avgKernelParticlesSlider = new Slider(200, height - 8 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 
 	restDensitySlider->SetRange(0.017, 1000);
-	viscositySlider->SetRange(0.001, 100);
+	viscositySlider->SetRange(1, 500);
 	stiffnessSlider->SetRange(0.01, 20);
 	surfaceTensionSlider->SetRange(0.001, 30);
 	massSlider->SetRange(0.001, 3);

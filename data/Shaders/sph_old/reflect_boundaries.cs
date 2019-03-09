@@ -15,7 +15,7 @@ struct Particle {
     float _;
 };
 
-uniform float damping_coeff = -0.5;
+uniform float damping_coeff = 0.5;
 
 layout(std430, binding=0) buffer Particles {
     Particle current_particles[];
@@ -30,18 +30,22 @@ void main()
     uint gid = gl_GlobalInvocationID.x;
     Particle p = current_particles[gid];
 
-/*    if (p.r.y >= half_h_size) {
-        p.v *= damping_coeff;
+    if (p.r.y >= half_h_size) {
+        p.v.x *= damping_coeff;
+		p.v.y *= -damping_coeff;
         p.r.y = half_h_size - eps;
-    } else*/ if (p.r.y <= -half_h_size) {
-        p.v *= damping_coeff;
-        p.r.y = -half_h_size + eps;
+    } else if (p.r.y <= 0.) {
+        p.v.x *= damping_coeff;
+		p.v.y *= -damping_coeff;
+        p.r.y = 0. + eps;
     } else if (p.r.x >= half_w_size) {
-        p.v *= damping_coeff;
+        p.v.x *= -damping_coeff;
+		p.v.y *= damping_coeff;
         p.r.x = half_w_size - eps;
-    } else if (p.r.x <= -half_w_size) {
-        p.v *= damping_coeff;
-        p.r.x = -half_w_size + eps;
+    } else if (p.r.x <= 0.) {
+        p.v.x *= -damping_coeff;
+		p.v.y *= damping_coeff;
+        p.r.x = 0 + eps;
     }
 
     current_particles[gid] = p;

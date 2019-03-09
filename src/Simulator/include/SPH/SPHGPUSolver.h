@@ -24,6 +24,7 @@ private:
 	ShaderProgram boundaries;
 	ShaderProgram render;
 	const char *renderVertexShaderPath = "sph_old//ParticleRender.vs";
+	const char *renderGeometryShaderPath = "sph_old//ParticleRender.gs";
 	const char *renderFragmentShaderPath = "sph_old//ParticleRender.fs";
 	const char *accumulateForcesPath = "sph_old//accumulate_forces.cs";
 	const char *densityAndPressurePath = "sph_old//density_and_pressure.cs";

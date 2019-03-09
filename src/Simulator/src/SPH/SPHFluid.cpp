@@ -59,10 +59,6 @@ void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view
 
 void SPHFluid::DragParticle(float x, float y, uint particleNum)
 {
-	if (particleNum >= particles->size())
-	{
-		return;
-	}
 	particles->at(particleNum).pos.x = x;
 	particles->at(particleNum).pos.y = y;
 	particles->at(particleNum).vel.x = 0;
@@ -77,7 +73,10 @@ void SPHFluid::SetBoundaryBox(BoundaryBox & box)
 void SPHFluid::AdjustParams(SPHFluidParams &params)
 {
 	this->params = params;
-	solver->UpdateParams(params);
+	if (solver)
+	{
+		solver->UpdateParams(params);
+	}
 }
 
 void SPHFluid::Init()
@@ -89,7 +88,7 @@ void SPHFluid::Init()
 		{
 			if (initGridSize * i + j >= particles->size())
 			{
-				return;
+				break;
 			}
 			particles->at(initGridSize * i + j).pos = 
 				glm::vec2
