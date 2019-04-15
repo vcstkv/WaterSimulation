@@ -13,7 +13,7 @@ typedef unsigned int uint;
 class SPHFluid
 {
 public:
-	SPHFluid(SPHFluidParams &params);
+	SPHFluid(SPHFluidParams &params, BoundaryBox &box);
 	~SPHFluid();
 	void Update(float delta);
 	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);

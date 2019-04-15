@@ -2,13 +2,14 @@
 #include "Graphics/Text/TextFont.h"
 
 TextFont *f;
-SPHFluid::SPHFluid(SPHFluidParams &params)
+SPHFluid::SPHFluid(SPHFluidParams &params, BoundaryBox &box)
 {
 	this->params = params;
 	particles = new std::vector<SPHParticle>(params.particlesCount);
 	f = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
 	f->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
 	solver = nullptr;
+	this->boundaryBox = box;
 	Init();
 }
 
@@ -75,7 +76,7 @@ void SPHFluid::AdjustParams(SPHFluidParams &params)
 	this->params = params;
 	if (solver)
 	{
-		solver->UpdateParams(params);
+		solver->UpdateParams(params, boundaryBox);
 	}
 }
 
@@ -93,8 +94,8 @@ void SPHFluid::Init()
 			particles->at(initGridSize * i + j).pos = 
 				glm::vec2
 				(
-				    2.f * params.particleRadius * (j + 3.f / 2.f) + 0.2f/*+ 500*/,
-					2.f * params.particleRadius * (i + 3.f / 2.f) + 0.1f/*+ 400*/
+				    2.f * params.particleRadius * (j + 3.f / 2.f) + 0.65f/*+ 500*/,
+					2.f * params.particleRadius * (i + 3.f / 2.f) + 0.4f/*+ 400*/
 				);
 			particles->at(initGridSize * i + j).vel = glm::vec2(0.);
 			particles->at(initGridSize * i + j).force = glm::vec2(0.);
@@ -106,7 +107,7 @@ void SPHFluid::Init()
 	}
 	if (!solver)
 	{
-		solver = new SPHGPUSolver(params, *particles);
+		solver = new SPHGPUSolver(params, boundaryBox, *particles);
 	}
 }
 

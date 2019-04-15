@@ -4,6 +4,18 @@
 
 struct SPHParticle
 {
+	SPHParticle::SPHParticle() :
+		pos(0.),
+		vel(0.),
+		force(0.),
+		prevForce(0.),
+		pressure(0.),
+		density(0.),
+		mass(0.),
+		bucket(0)
+	{
+
+	}
 	glm::vec2 pos;
 	glm::vec2 vel;
 	glm::vec2 force;
@@ -11,6 +23,31 @@ struct SPHParticle
 	float pressure;
 	float density;
 	float mass;
-	float _;
+	unsigned int bucket;
+};
+
+struct SPHParticleSortIntermediateData
+{
+	SPHParticleSortIntermediateData::SPHParticleSortIntermediateData() :
+		_data(0),
+		_globalIndexOfOriginalData(0)
+	{
+	}
+
+	unsigned int _data;
+	unsigned int _globalIndexOfOriginalData;
+};
+
+struct SPHParticleIndex
+{
+	SPHParticleIndex::SPHParticleIndex(unsigned int particlesCount) : 
+		begin(particlesCount),
+		end(0)
+	{
+	}
+
+	unsigned int begin;
+	unsigned int end;
+	unsigned int n[9] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 };
 

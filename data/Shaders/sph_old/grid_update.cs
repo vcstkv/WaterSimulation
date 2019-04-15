@@ -11,14 +11,14 @@ struct Particle {
     float p; // pressure
     float d; // density
     float m; // mass
-    uint bucket;
+    float _;
 };
 
 layout(std430, binding=0) buffer Particles {
     Particle current_particles[];
 };
 
-layout(std430, binding=4) buffer Index {
+layout(std430, binding=1) buffer Index {
     uint index[];
 };
 

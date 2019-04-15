@@ -17,8 +17,11 @@ struct SPHFluidParams
 	float distanceThreshold;
 	float maxAcc;
 	float maxVel;
+	float bucketSize;
+	uint bucketsCountX;
+	uint bucketsCountY;
 	uint avgKernelParticles;
-	unsigned int particlesCount;
+	uint particlesCount;
 };
 
 typedef struct

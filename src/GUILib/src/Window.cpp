@@ -34,6 +34,8 @@ Window* Window::Create(int width, int height, std::string *title)
 		return nullptr;
 	}
 
+	glfwSwapInterval(0);
+
 	glfwMakeContextCurrent(glfwWindow);
 
 	glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
