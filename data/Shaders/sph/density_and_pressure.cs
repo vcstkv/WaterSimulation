@@ -53,7 +53,7 @@ void main()
     const float k_poly6_coeff = 315.0/(64.0 * PI * pow(h, 9));
     const float h2 = h * h;
 
-    p.d = rd;
+    p.d = 0;
 	uint i = 0;
 	uint j = 0;
 	Index neighborIdx;
@@ -71,17 +71,20 @@ void main()
 	
 			vec2 dr = p.r - nighborP.r;
 			
-			if (length(dr) > h)
+			float d_h2_dr2 = h2 - dot(dr, dr);
+			
+			if (d_h2_dr2 < 0.)
 			{
 				continue;
 			}
-			
-			float d_h2_dr2 = h2 - dot(dr, dr);
 	
 			p.d += nighborP.m * k_poly6_coeff * d_h2_dr2 * d_h2_dr2 * d_h2_dr2;
 		}
     }
 
+	if (p.d <= 0) {
+		p.d = 0.00001;
+	}		
     p.p = k * (p.d - rd);
     particles[p_i] = p;
 }
