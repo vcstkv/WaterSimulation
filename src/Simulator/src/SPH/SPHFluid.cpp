@@ -82,27 +82,30 @@ void SPHFluid::AdjustParams(SPHFluidParams &params)
 
 void SPHFluid::Init()
 {
-	uint initGridSize = static_cast<uint>(ceil(sqrt(particles->size())));
-	for (uint i = 0; i < initGridSize; i++)
+	double ratio = 1. / 1.;
+	uint h = static_cast<uint>(ceil(sqrt(1. * particles->size() / ratio)));
+	uint w = static_cast<uint>(ratio * h);
+	for (uint i = 0; i < h; i++)
 	{
-		for (uint j = 0; j < initGridSize; j++)
+		for (uint j = 0; j < w; j++)
 		{
-			if (initGridSize * i + j >= particles->size())
+			if (w * i + j >= particles->size())
 			{
 				break;
 			}
-			particles->at(initGridSize * i + j).pos = 
+			SPHParticle &p = particles->at(w * i + j);
+			p.pos = 
 				glm::vec2
 				(
-				    2.f * params.particleRadius * (j + 3.f / 2.f) + 0.65f/*+ 500*/,
-					2.f * params.particleRadius * (i + 3.f / 2.f) + 0.4f/*+ 400*/
+				    2.f * 2.2f * params.particleRadius * (j + 3.f / 2.f) + 0.1f/*+ 500*/,
+					2.f * 2.2f * params.particleRadius * (i + 3.f / 2.f) + 0.1f/*+ 400*/
 				);
-			particles->at(initGridSize * i + j).vel = glm::vec2(0.);
-			particles->at(initGridSize * i + j).force = glm::vec2(0.);
-			particles->at(initGridSize * i + j).prevForce = glm::vec2(0.);
-			particles->at(initGridSize * i + j).density = 0.f;
-			particles->at(initGridSize * i + j).pressure = 0.f;
-			particles->at(initGridSize * i + j).mass = params.particleMass;
+			p.vel = glm::vec2(0.);
+			p.force = glm::vec2(0.);
+			p.prevForce = glm::vec2(0.);
+			p.density = 0.f;
+			p.pressure = 0.f;
+			p.mass = params.particleMass;
 		}
 	}
 	if (!solver)

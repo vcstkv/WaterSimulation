@@ -352,15 +352,17 @@ void SPHGPUSolver::UpdateParams(SPHFluidParams &params, BoundaryBox &box)
 
 	origDataToInterData.Enable();
 	glUniform1f(origDataToInterData.GetUniformLocation("cellSize"), params.bucketSize);
+	glUniform1f(origDataToInterData.GetUniformLocation("gridX"), box.xMin);
+	glUniform1f(origDataToInterData.GetUniformLocation("gridY"), box.yMin);
 	glUniform1ui(origDataToInterData.GetUniformLocation("cellsCount"), params.bucketsCountX);
 	origDataToInterData.Disable();
 
 	accumulateForces.Enable();
 	glUniform1f(accumulateForces.GetUniformLocation("h"), params.effectiveRadius);
 	glUniform1f(accumulateForces.GetUniformLocation("mu"), params.viscocity);
-	glUniform1f(accumulateForces.GetUniformLocation("s_tens_coeff"), -params.surfaceTension);
+	glUniform1f(accumulateForces.GetUniformLocation("s_tens_coeff"), params.surfaceTension);
 	glUniform1f(accumulateForces.GetUniformLocation("s_tens_tresh"), params.tensionTreshold);
-	glUniform1f(accumulateForces.GetUniformLocation("g"), 9.81f);
+	glUniform1f(accumulateForces.GetUniformLocation("g"), 0.f/*-9.81f*/);
 	glUniform1ui(accumulateForces.GetUniformLocation("index_max_neighbors"), params.avgKernelParticles);
 	accumulateForces.Disable();
 
@@ -385,7 +387,7 @@ void SPHGPUSolver::UpdateParams(SPHFluidParams &params, BoundaryBox &box)
 	leapfrogIntegration.Disable();
 
 	boundaries.Enable();
-	glUniform1f(boundaries.GetUniformLocation("damping_coeff"), 0.7f);
+	glUniform1f(boundaries.GetUniformLocation("damping_coeff"), 0.6f);
 	glUniform1f(boundaries.GetUniformLocation("boxMinX"), box.xMin);
 	glUniform1f(boundaries.GetUniformLocation("boxMaxX"), box.xMax);
 	glUniform1f(boundaries.GetUniformLocation("boxMinY"), box.yMin);
@@ -394,9 +396,9 @@ void SPHGPUSolver::UpdateParams(SPHFluidParams &params, BoundaryBox &box)
 
 	render.Enable();
 	glUniform1f(render.GetUniformLocation("k_ring_radius"), params.effectiveRadius);
-	glUniform1f(render.GetUniformLocation("p_ring_radius"), params.particleRadius);
-	glUniform1f(render.GetUniformLocation("k_ring_width"), 0.0005);
-	glUniform1f(render.GetUniformLocation("p_ring_width"), 0.0005);
+	glUniform1f(render.GetUniformLocation("p_ring_radius"), 1.5f * params.particleRadius);
+	glUniform1f(render.GetUniformLocation("k_ring_width"), 0.005);
+	glUniform1f(render.GetUniformLocation("p_ring_width"), 0.005);
 	render.Disable();
 }
 
@@ -413,27 +415,27 @@ void SPHGPUSolver::Advect(SPHFluidParams &params, std::vector<SPHParticle> &part
 	indexClear.Disable();
 
 	indexUpdate.Enable();
-	glDispatchCompute(particlesCount / WORK_GROUP_SIZE, 1, 1);
+	glDispatchCompute(particlesCount / WORK_GROUP_SIZE + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	indexUpdate.Disable();
 
 	densityAndPressure.Enable();
-	glDispatchCompute(particlesCount / WORK_GROUP_SIZE, 1, 1);
+	glDispatchCompute(particlesCount / WORK_GROUP_SIZE + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	densityAndPressure.Disable();
 
 	accumulateForces.Enable();
-	glDispatchCompute(particlesCount / WORK_GROUP_SIZE, 1, 1);
+	glDispatchCompute(particlesCount / WORK_GROUP_SIZE + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	accumulateForces.Disable();
 
 	leapfrogIntegration.Enable();
-	glDispatchCompute(particlesCount / WORK_GROUP_SIZE, 1, 1);
+	glDispatchCompute(particlesCount / WORK_GROUP_SIZE + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	leapfrogIntegration.Disable();
 
 	boundaries.Enable();
-	glDispatchCompute(particlesCount / WORK_GROUP_SIZE, 1, 1);
+	glDispatchCompute(particlesCount / WORK_GROUP_SIZE + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	boundaries.Disable();
 

@@ -10,7 +10,8 @@ void main()
 {
 	vec2 c = uv - vec2(0.5);
 	float dist = sqrt(dot(c, c));
-    if (dist >= 0.5 /*|| dist < pri*/ /*|| (dist > pro && dist < kri)*/)
+    //if (dist >= 0.5 /*|| dist < pri*/ || (dist > pro && dist < kri))
+	if (dist > pro)
     { 
 		discard;
 	}

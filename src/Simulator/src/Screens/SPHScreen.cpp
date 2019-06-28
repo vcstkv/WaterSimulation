@@ -43,7 +43,7 @@ SPHScreen::~SPHScreen()
 SPHScreen::SPHScreen(int width, int height) : Screen(width, height)
 {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	scaleCoeff = width / 1.8f;
+	scaleCoeff = width / 6.0f;
 	projection = glm::ortho(0.0f, width * 1.0f, 0.0f, height * 1.0f, 1.0f, -1.0f);
 	view = /*glm::mat4(1);*/glm::scale(glm::vec3(scaleCoeff, scaleCoeff, 1));
 	guiview = glm::mat4(1);
@@ -64,10 +64,16 @@ void SPHScreen::Update(float delta)
 	}
 }
 
+bool isGUI = true;
+
 void SPHScreen::Render(Graphics *graphics)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	fluid->Render(graphics, &projection, &view);
+	if (!isGUI)
+	{
+		return;
+	}
 	fnt->DrawText(L"density: " + std::to_wstring(restDensitySlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 50 + 24 + 10, &projection);
 	restDensitySlider->Draw(graphics, &projection, &guiview);
 	fnt->DrawText(L"viscosity: " + std::to_wstring(viscositySlider->GetValue()), 24, &glm::vec4(0, 0, 0, 1), 0, height - 2 * 50 + 24 + 10, &projection);
@@ -142,7 +148,7 @@ void SPHScreen::OnKeyboardEvent(int key, int scanCode, int action, int mods)
 		if (action == GLFW_PRESS)
 		{
 			//fluid->Init();
-			isAutoPlay = true;
+			isAutoPlay = !isAutoPlay;
 		}
 		break;
 	case GLFW_KEY_SPACE:
@@ -155,6 +161,12 @@ void SPHScreen::OnKeyboardEvent(int key, int scanCode, int action, int mods)
 		if (action == GLFW_REPEAT)
 		{
 			fluid->Update(0.);
+		}
+		break;
+	case GLFW_KEY_H:
+		if (action == GLFW_PRESS)
+		{
+			isGUI = !isGUI;
 		}
 		break;
 	}
@@ -246,18 +258,18 @@ void SPHScreen::Initialize()
 {
 	p.restDensity = 1000.f;
 	p.restPressure = 0.001f;
-	p.viscocity = 141.f;
+	p.viscocity = 50.f;
 	p.dt = 0.001f;
-	p.stiffness = 8.7f;//0.3;//3.5;
+	p.stiffness = 20.f;//0.3;//3.5;
 	p.surfaceTension = 0.8f;
 	p.avgKernelParticles = 40;
 	p.maxAcc = 100.f;
 	p.maxVel = 0.8f;
 	p.tensionTreshold = sqrtf(p.restDensity / p.avgKernelParticles);
 	p.particleMass = 0.02f;
-	p.particlesCount = /*32768;*//*8192;*/ 4096;
-	p.particleRadius = sqrtf(p.particleMass * M_1_PI / p.restDensity);//std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
-	p.effectiveRadius = 2.f * sqrtf(p.avgKernelParticles * p.particleRadius * p.particleRadius /** p.particleMass * M_1_PI / p.restDensity*/);//p.particleRadius * 3.5;/*std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity * 10)*/;
+	p.particlesCount = 30000;// 65536;//32768;/*8192;*/ //10000;
+	p.particleRadius = 2.f * sqrtf(p.particleMass * M_1_PI / p.restDensity);//*/std::cbrt(0.75 * p.particleMass * M_1_PI / p.restDensity);
+	p.effectiveRadius = 3.f * sqrtf(p.avgKernelParticles * /*p.particleRadius * p.particleRadius*/ p.particleMass * M_1_PI / p.restDensity);//p.particleRadius * 3.5;*/std::cbrt(0.75 * p.particleMass * M_1_PI * p.avgKernelParticles / p.restDensity);
 	//p.restDensity = 100000.f;
 
 	BoundaryBox box =
@@ -288,10 +300,10 @@ void SPHScreen::Initialize()
 	maxAccSlider = new Slider(200, height - 7 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 	avgKernelParticlesSlider = new Slider(200, height - 8 * 50, 400, 20, &glm::vec4(1, 0, 0, 1));
 
-	restDensitySlider->SetRange(0.017, 1000000);
+	restDensitySlider->SetRange(0.017, 1000);
 	viscositySlider->SetRange(0.001, 500);
-	stiffnessSlider->SetRange(0.01, 20);
-	surfaceTensionSlider->SetRange(0.001, 30);
+	stiffnessSlider->SetRange(0.01, 200);
+	surfaceTensionSlider->SetRange(0.001, 100);
 	massSlider->SetRange(0.001, 3);
 	maxVelSlider->SetRange(0.1, 100);
 	maxAccSlider->SetRange(1, 200);
@@ -315,8 +327,8 @@ void SPHScreen::Initialize()
 		}
 		ParamSliderData *sd = (ParamSliderData*)data;
 		sd->p->restDensity = value;
-		sd->p->particleRadius = sqrtf(sd->p->particleMass * M_1_PI / sd->p->restDensity);
-		sd->p->effectiveRadius = sqrtf(sd->p->avgKernelParticles * sd->p->particleRadius * sd->p->particleRadius);
+		//sd->p->particleRadius = sqrtf(sd->p->particleMass * M_1_PI / sd->p->restDensity);
+		//sd->p->effectiveRadius = sqrtf(sd->p->avgKernelParticles * sd->p->particleRadius * sd->p->particleRadius);
 		sd->f->AdjustParams(*sd->p);
 	}, &sd);
 	viscositySlider->SetCallback(

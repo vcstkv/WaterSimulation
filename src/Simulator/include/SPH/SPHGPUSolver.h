@@ -31,15 +31,15 @@ private:
 	ShaderProgram sortInterData;
 	ShaderProgram sortOrigData;
 	//-----------------------------------------------------
-	const char *renderVertexShaderPath = "sph_old//ParticleRender.vs";
-	const char *renderGeometryShaderPath = "sph_old//ParticleRender.gs";
-	const char *renderFragmentShaderPath = "sph_old//ParticleRender.fs";
-	const char *accumulateForcesPath = "sph_old//accumulate_forces.cs";
-	const char *densityAndPressurePath = "sph_old//density_and_pressure.cs";
-	const char *indexClearPath = "sph_old//clear_index.cs";
-	const char *indexUpdatePath = "sph_old//update_index.cs";
-	const char *leapfrogIntegrationPath = "sph_old//leapfrog_integration.cs";
-	const char *boundariesPath = "sph_old//reflect_boundaries.cs";
+	const char *renderVertexShaderPath =	"sph//ParticleRender.vs";
+	const char *renderGeometryShaderPath =	"sph//ParticleRender.gs";
+	const char *renderFragmentShaderPath =	"sph//ParticleRender.fs";
+	const char *accumulateForcesPath =		"sph//accumulate_forces.cs";
+	const char *densityAndPressurePath =	"sph//density_and_pressure.cs";
+	const char *indexClearPath =			"sph//index_clear.cs";
+	const char *indexUpdatePath =			"sph//index_update.cs";
+	const char *leapfrogIntegrationPath =	"sph//leapfrog_integration.cs";
+	const char *boundariesPath =			"sph//reflect_boundaries.cs";
 
 	uint particlesCount;
 	GLuint particlesBuffer;
