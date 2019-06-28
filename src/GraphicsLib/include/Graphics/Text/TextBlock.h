@@ -1,9 +1,4 @@
 #pragma once
-#ifdef GRAPHICS_EXPORTS
-#define GRAPHICS_API __declspec(dllexport) 
-#else
-#define GRAPHICS_API __declspec(dllimport)
-#endif
 #include "Graphics/GLHeaders.h"
 #include <string>
 #include <vector>

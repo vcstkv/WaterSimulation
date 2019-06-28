@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics/Graphics.h"
 #include "ScreenController.h"
+
 #ifdef GAMEENGINE_EXPORTS
 #define GAMEENGINE_API __declspec(dllexport) 
 #else
@@ -16,6 +17,9 @@ public:
 	GAMEENGINE_API virtual ~Screen();
 	GAMEENGINE_API virtual void Update(float delta) = 0;
 	GAMEENGINE_API virtual void Render(Graphics *graphics) = 0;
+	GAMEENGINE_API virtual void OnMouseButtonEvent(int btn, int action, int mods) = 0;
+	GAMEENGINE_API virtual void OnMouseCursorEvent(double x, double y) = 0;
+	GAMEENGINE_API virtual void OnKeyboardEvent(int key, int scanCode, int action, int mods) = 0;
 	GAMEENGINE_API virtual void OnKeyPress(int buttonID, bool isPressed) = 0;
 	GAMEENGINE_API virtual void OnKeyRelease(int buttonID) = 0;
 	GAMEENGINE_API virtual void Initialize() = 0;

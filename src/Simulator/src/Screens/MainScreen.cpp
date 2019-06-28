@@ -57,7 +57,7 @@ void MainScreen::Render(Graphics *graphics)
 			grass->Draw(&projection, &view);
 		}
 	}
-	graphics->DrawLine(400, 400, 0, 0, &vec4(1, 1, 0, 1), &projection);
+	graphics->DrawLine(400, 400, 0, 0, 1.0, &vec4(1, 1, 0, 1), &projection);
 	font->DrawText(L"Jdg12", textSize, &vec4(0, 0, 0, 1), 0, 600, &projection);
 	btn->Draw(&projection, &view);
 	//std::cout << glGetError() << std::endl;
@@ -134,6 +134,18 @@ void MainScreen::OnKeyPress(int buttonID, bool isPressed)
 		}
 		break;
 	}
+}
+
+void MainScreen::OnMouseButtonEvent(int btn, int action, int mods)
+{
+}
+
+void MainScreen::OnMouseCursorEvent(double x, double y)
+{
+}
+
+void MainScreen::OnKeyboardEvent(int key, int scanCode, int action, int mods)
+{
 }
 
 void MainScreen::OnKeyRelease(int buttonID)

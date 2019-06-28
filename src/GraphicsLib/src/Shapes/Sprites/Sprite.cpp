@@ -51,16 +51,16 @@ void Sprite::InitializeSprite()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Sprite::SetSize(int width, int height)
+void Sprite::SetSize(float width, float height)
 {
 	this->width = width;
 	this->height = height;
 	float vertices[] =
 	{
-		-width / 2, -height / 2,
-		-width / 2,  height / 2,
-		 width / 2,  height / 2,
-		 width / 2, -height / 2
+		-width / 2.f, -height / 2.f,
+		-width / 2.f,  height / 2.f,
+		 width / 2.f,  height / 2.f,
+		 width / 2.f, -height / 2.f
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
