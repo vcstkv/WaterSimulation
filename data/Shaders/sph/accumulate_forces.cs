@@ -84,11 +84,11 @@ void main()
 				continue;
 			}
 			
-            vec2 ndr = ldr > 0 ? normalize(dr) : vec2(0, 0);
+            vec2 ndr = ldr > 0 ? (dr/ldr) : vec2(0, 0);
 			rel_mass = nighborP.m / nighborP.d;
 			
             // pressure force
-            f_press += ndr * -rel_mass * 0.5 * (nighborP.p + p.p) * k_grad_coeff * (h - ldr) * (h - ldr);
+            f_press += ndr * rel_mass * 0.5 * (nighborP.p + p.p) * k_grad_coeff * (h - ldr) * (h - ldr);
 
             // viscosity force
             f_vis += rel_mass * (nighborP.v - p.v) * k_lap_coeff * (h - ldr);
@@ -109,9 +109,9 @@ void main()
 		f_s_tens = vec2(.0f, .0f);
 	}
 	
-    vec2 f_grav = vec2(0, -p.d * g);
+    vec2 f_grav = vec2(0, g * p.d);
 
-    p.f = f_press + f_grav + mu * f_vis + f_s_tens;
+    p.f = -f_press + f_grav + mu * f_vis + f_s_tens;
 
     particles[p_i] = p;
 }

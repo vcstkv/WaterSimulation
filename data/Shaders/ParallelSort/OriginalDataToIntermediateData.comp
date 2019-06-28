@@ -24,10 +24,12 @@ Creator:    John Cox, 3/2017
 
 uniform float cellSize;
 uniform uint cellsCount;
+uniform float gridX;
+uniform float gridY;
 
 uint Hash(vec2 pos)
 {
-	return uint(floor(pos.y / cellSize) * cellsCount + floor(pos.x / cellSize));
+	return uint(floor((pos.y - gridY) / cellSize) * cellsCount + floor((pos.x - gridX)/ cellSize));
 }
 
 void main()

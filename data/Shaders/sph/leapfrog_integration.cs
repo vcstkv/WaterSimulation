@@ -23,7 +23,12 @@ layout(std430, binding = 0) buffer Particles {
 
 void main()
 {
-    uint gid = gl_GlobalInvocationID.x;
+    uint gid = gl_GlobalInvocationID.x;	
+	if (gid >= current_particles.length())
+	{
+		return;
+	}
+	
     Particle p = current_particles[gid];
 
     vec2 v_half = p.v + 0.5 * dt * p.prev_f / p.d;

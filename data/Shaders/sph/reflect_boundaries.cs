@@ -26,29 +26,43 @@ uniform float boxMaxY = 1.5;
 uniform float boxMinY = 0.0;
 uniform float boxMaxX = 1.8;
 
-const float eps = 0.0001;
-
 void main()
 {
     uint gid = gl_GlobalInvocationID.x;
+	if (gid >= current_particles.length())
+	{
+		return;
+	}
     Particle p = current_particles[gid];
+	
+	float eps = 0.00001 * (boxMaxX - boxMinX);
 
-    if (p.r.y > boxMaxY) {
-        p.v.x *= damping_coeff;
+    if (p.r.y > boxMaxY)
+	{
+        //p.v.x *= damping_coeff;
 		p.v.y *= -damping_coeff;
-        p.r.y = boxMaxY;
-    } else if (p.r.y < boxMinY) {
-        p.v.x *= damping_coeff;
+        p.r.y = boxMaxY - eps;
+    }
+	
+	if (p.r.x > boxMaxX)
+	{
+        p.v.x *= -damping_coeff;
+		//p.v.y *= damping_coeff;
+        p.r.x = boxMaxX - eps;
+    }
+	
+	if (p.r.y < boxMinY)
+	{
+        //p.v.x *= damping_coeff;
 		p.v.y *= -damping_coeff;
-        p.r.y = boxMinY;
-    } else if (p.r.x > boxMaxX) {
+        p.r.y = boxMinY + eps;
+    } 
+	
+	if (p.r.x < boxMinX)
+	{
         p.v.x *= -damping_coeff;
-		p.v.y *= damping_coeff;
-        p.r.x = boxMaxX;
-    } else if (p.r.x < boxMinX) {
-        p.v.x *= -damping_coeff;
-		p.v.y *= damping_coeff;
-        p.r.x = boxMinX;
+		//p.v.y *= damping_coeff;
+        p.r.x = boxMinX + eps;
     }
 
     current_particles[gid] = p;
