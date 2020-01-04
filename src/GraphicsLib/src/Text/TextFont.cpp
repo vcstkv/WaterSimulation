@@ -6,38 +6,39 @@
 #include <fstream>
 
 
-void TextFont::DrawText(std::wstring text, double size, glm::vec4 *color, double x, double y, glm::mat4 *projection)
+void TextFont::DrawText(std::wstring text, float size, const glm::vec4 &color, float x, float y, const glm::mat4 &projection)
 {
-	scale.x = size * 1.f / fontSize;
+	scale.x = size / fontSize;
 	scale.y = -scale.x;
-	scale.z = 1;
-	sprite->SetScale(&scale);
-	sprite->SetPosition(x, y);
+	scale.z = 1.f;
+	sprite->Scale(scale);
+	sprite->SetPosition(x, y, 0);
 	for (uint32_t i = 0, j = 0; i < text.size(); i++)
 	{
-
 		if (text[i] == L'\n')
 		{
-			//model[3].x = x;
-			sprite->Translate(0, -fontSize);
+			sprite->Translate(glm::vec3(0, -fontSize, 0));
 			continue;
 		}
 		j = 1 + (text[i] > 1000 ? (text[i] - 945 ) : (text[i] - 32));
-		sprite->Translate(glyphs[j].width / 2 * scale.x, -glyphs[j].height / 2 * scale.x);
-		sprite->Translate(glyphs[j].xOffset * scale.x, -glyphs[j].yOffset* scale.x);
+		sprite->Translate(glyphs[j].width * 0.5f * scale.x, -glyphs[j].height * 0.5f * scale.x, 0);
+		sprite->Translate(glyphs[j].xOffset * scale.x, -glyphs[j].yOffset* scale.x, 0);
 
 		sprite->SetTextureShape(glyphs[j].x, glyphs[j].y, glyphs[j].width, glyphs[j].height);
 		sprite->SetColor(color);
-		sprite->Draw(projection, &glm::mat4(1));
+		sprite->Draw(projection, glm::mat4(1));
 
-		sprite->Translate(-glyphs[j].xOffset* scale.x, glyphs[j].yOffset* scale.x);
-		sprite->Translate(-glyphs[j].width / 2 * scale.x, glyphs[j].height / 2 * scale.x);
-		sprite->Translate(glyphs[j].xAdvance * scale.x, 0);
+		sprite->Translate(-glyphs[j].xOffset* scale.x, glyphs[j].yOffset* scale.x, 0);
+		sprite->Translate(-glyphs[j].width * 0.5f * scale.x, glyphs[j].height * 0.5f * scale.x, 0);
+		sprite->Translate(glyphs[j].xAdvance * scale.x, 0, 0);
 	}
+	scale.x = 1.f / scale.x;
+	scale.y = 1.f / scale.y;
+	sprite->Scale(scale);
 }
 
 
-TextFont::TextFont(char* filePath)
+TextFont::TextFont(const char* filePath)
 {
 	LoadFont(filePath);
 }
@@ -58,17 +59,17 @@ void TextFont::ShowInfo()
 	}
 }
 
-void TextFont::AddParamValue(glm::vec4 *delta)
+void TextFont::AddParamValue(const glm::vec4 &delta)
 {
 	sprite->AddParams(delta);
 }
 
-void TextFont::SetParamValue(glm::vec4 *params)
+void TextFont::SetParamValue(const glm::vec4 &params)
 {
 	sprite->SetParams(params);
 }
 
-void TextFont::LoadFont(char *filePath)
+void TextFont::LoadFont(const char *filePath)
 {
 	uint32_t headerSize = 5;
 	uint8_t  *buffer;
@@ -126,10 +127,10 @@ void TextFont::LoadFont(char *filePath)
 	
 	folderPath = folderPath + '\\' + textureFileName;
 
-	sprite = new SDFChar(&glm::vec2(0.0, 50));
+	sprite = new SDFChar(glm::vec2(0.0, 50));
 	sprite->SetShader("SDFText.vs", "SDFText.fs");
 	sprite->SetTexture(folderPath.c_str(), false);
-	sprite->SetBorder(&glm::vec4(1, 1, 0, 1), &glm::vec2(0.5, 50));
+	sprite->SetBorder(glm::vec4(1, 1, 0, 1), glm::vec2(0.5, 50));
 
 	glyphsCount = charsBlockLength / 20;
 
@@ -150,7 +151,7 @@ void TextFont::LoadFont(char *filePath)
 	delete[] buffer;
 }
 
-char* TextFont::GetFilePath()
+std::string TextFont::GetFilePath()
 {
 	return filePath;
 }

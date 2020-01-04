@@ -13,7 +13,7 @@ public:
 	~SPHGPUSolver();
 	void UpdateParams(SPHFluidParams &params, BoundaryBox &box);
 	void Advect(SPHFluidParams &params, std::vector<SPHParticle> &particles);
-	void Render(glm::mat4 *projection, glm::mat4 *view);
+	void Render(const glm::mat4 &projection, const glm::mat4 &view);
 	void UseBoundary(BoundaryBox &box, std::vector<SPHParticle> &p);
 	void SortParticles();
 private:

@@ -1,8 +1,7 @@
 #pragma once
 
-class GraphicsResources
+namespace GraphicsResources
 {
-	public:
-	static const char* const shadersFolderPath;
-	static const char* const texturesFolderPath;
-};
+	extern const char* const shadersFolderPath;
+	extern const char* const texturesFolderPath;
+}

@@ -9,8 +9,6 @@ ShaderProgram::ShaderProgram()
 	if (id > 0)
 	{
 		printf(" OK, id: %d", id);
-		attachedShaders = new std::map<GLuint, const char*>();
-		compositeShadersCodeBuffer = new std::map<GLuint, std::string>();
 	}
 	else
 	{
@@ -36,28 +34,20 @@ ShaderProgram::~ShaderProgram()
 	if (id > 0)
 	{
 		glDeleteProgram(id);
-		attachedShaders->clear();
-		delete attachedShaders;
-	}
-	if (compositeShadersCodeBuffer)
-	{
-		compositeShadersCodeBuffer->clear();
-		delete compositeShadersCodeBuffer;
 	}
 }
 
 std::string ShaderProgram::LoadShaderCode(GLuint sid, const char *fileName)
 {
 	std::string src;
-	char path[128];
-	strcpy(path, GraphicsResources::shadersFolderPath);
-	strcat(path, fileName);
+	std::string path(GraphicsResources::shadersFolderPath);
+	path.append(fileName);
 
 	printf("\nLoading shader %d: %s", sid, fileName);
 
 	uint8_t *buffer;
 	uint32_t srcLength;
-	if (!FilesIOLibrary::LoadFile(path, &buffer, &srcLength))
+	if (!FilesIOLibrary::LoadFile(path.data(), &buffer, &srcLength))
 	{
 		return src;
 	}
@@ -67,7 +57,7 @@ std::string ShaderProgram::LoadShaderCode(GLuint sid, const char *fileName)
 	return src;
 }
 
-bool ShaderProgram::CompileShader(GLuint sid, std::string &src)
+bool ShaderProgram::CompileShader(GLuint sid, const std::string &src)
 {
 	printf("\nCompiling shader: %d", sid);
 
@@ -95,7 +85,7 @@ bool ShaderProgram::CompileShader(GLuint sid, std::string &src)
 
 bool ShaderProgram::LoadShader(GLuint sid, const char *fileName)
 {
-	std::string src = LoadShaderCode(sid, fileName);
+	const std::string &src = LoadShaderCode(sid, fileName);
 	return !src.empty() && CompileShader(sid, src);
 }
 
@@ -155,23 +145,19 @@ GLint ShaderProgram::GetUniformLocation(const GLchar *name)
 GLuint ShaderProgram::CreateCompositeShader(GLenum type)
 {
 	GLuint sid;
-	if (!compositeShadersCodeBuffer || ((sid = glCreateShader(type)) == 0))
+	if ((sid = glCreateShader(type)) == 0)
 	{
 		return 0;
 	}
 
-	compositeShadersCodeBuffer->insert(std::pair<GLuint, std::string>(sid, std::string()));
+	compositeShadersCodeBuffer.emplace(sid, std::string());
 	return sid;
 }
 
 void ShaderProgram::AddPartialShaderFile(GLuint compositeShader, const char* fileName)
 {
-	if (!compositeShadersCodeBuffer)
-	{
-		return;
-	}
-	auto it = compositeShadersCodeBuffer->find(compositeShader);
-	if (it != compositeShadersCodeBuffer->end())
+	auto it = compositeShadersCodeBuffer.find(compositeShader);
+	if (it != compositeShadersCodeBuffer.end())
 	{
 		it->second.append("\n" + LoadShaderCode(compositeShader, fileName));
 	}
@@ -179,15 +165,11 @@ void ShaderProgram::AddPartialShaderFile(GLuint compositeShader, const char* fil
 
 void ShaderProgram::CompileCompositeShader(GLuint compositeShader)
 {
-	if (!compositeShadersCodeBuffer)
-	{
-		return;
-	}
-	auto it = compositeShadersCodeBuffer->find(compositeShader);
-	if (it != compositeShadersCodeBuffer->end())
+	auto it = compositeShadersCodeBuffer.find(compositeShader);
+	if (it != compositeShadersCodeBuffer.end())
 	{
 		CompileShader(compositeShader, it->second);
 	}
 	glAttachShader(id, compositeShader);
-	compositeShadersCodeBuffer->erase(it);
+	compositeShadersCodeBuffer.erase(it);
 }

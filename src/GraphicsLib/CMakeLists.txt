@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)					
 
+set (CMAKE_CXX_STANDARD 17)
+
 file(GLOB_RECURSE SOURCES 
 	"*.h"
 	"*.hpp"
@@ -26,8 +28,8 @@ target_link_libraries(libgraphics
 	PUBLIC glew32s
 )
 
-add_custom_command(
-	TARGET libgraphics POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} 
-	-E copy $<TARGET_FILE:libgraphics> ${CMAKE_SOURCE_DIR}/bin 
-)				
+#add_custom_command(
+#	TARGET libgraphics POST_BUILD 
+#    COMMAND ${CMAKE_COMMAND} 
+#	-E copy $<TARGET_FILE:libgraphics> ${CMAKE_SOURCE_DIR}/bin 
+#)				

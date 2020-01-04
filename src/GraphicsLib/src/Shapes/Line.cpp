@@ -8,15 +8,15 @@ Line::Line()
 	Init();
 }
 
-Line::Line(float x1, float y1, float x2, float y2, float width, glm::vec4 *color)
+Line::Line(const glm::vec3 &b, const glm::vec3 &e, float width, const glm::vec4 &color)
 {
 	Init();
-	SetLine(x1, y1, x2, y2, width, color);
+	SetLine(b, e, width, color);
 }
 
 void Line::Init()
 {
-	float init[] = { 0, 0, 0, 0 };
+	float init[] = { 0, 0, 0, 0, 0, 0 };
 
 	width = 1.;
 
@@ -25,15 +25,13 @@ void Line::Init()
 
 	glBindVertexArray(vertexArrayObject);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount * 2, init, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount * dim, init, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, dim, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	shaderProgram = new SpriteShaderProgram("CommonSprite.vs", "CommonSprite.fs");
 }
-
-
 
 Line::~Line()
 {
@@ -42,31 +40,31 @@ Line::~Line()
 	delete shaderProgram;
 }
 
-void Line::Draw(glm::mat4 *projection)
+void Line::Draw(const glm::mat4 &projection, const glm::mat4 &view)
 {
 	shaderProgram->Enable();
 	
-	glUniformMatrix4fv(shaderProgram->mvpShLoc, 1, GL_FALSE,  &(*projection)[0][0]);
-	glUniform4fv(shaderProgram->matDiffColorShLoc, 1, &(color)[0]);
+	glUniformMatrix4fv(shaderProgram->mvpShLoc, 1, GL_FALSE,  &(projection * view)[0][0]);
+	glUniform4fv(shaderProgram->matDiffColorShLoc, 1, &color[0]);
 	glUniform1i(shaderProgram->isColoredShLoc, 0);
 	glBindVertexArray(vertexArrayObject);
 	glEnableVertexAttribArray(0);
 	glLineWidth(width);
-	glDrawArrays(GL_LINES, 0, vertexCount * 2);
+	glDrawArrays(GL_LINES, 0, vertexCount * dim);
 	glLineWidth(1.);
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	shaderProgram->Disable();
 }
 
-void Line::SetLine(float x1, float y1, float x2, float y2, float width, glm::vec4 *color)
+void Line::SetLine(const glm::vec3 &b, const glm::vec3 &e, float width, const glm::vec4 &color)
 {
-	this->color = *color;
+	this->color = color;
 	this->width = width;
 
-	float vertices[] = { x1, y1, x2, y2 };
+	float vertices[] = { b.x, b.y, b.z, e.x, e.y, e.z };
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertexCount * 2, vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertexCount * dim, vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

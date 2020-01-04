@@ -1,41 +1,28 @@
-#pragma once
-#include "glfw3/glfw3.h"
+#ifndef GUI_WINDOW_HEADER
+#define GUI_WINDOW_HEADER
+
 #include <string>
-#include <vector>
+#include <list>
 
-typedef void(*MouseButtonEventCb)(int, int, int, void *data);
-
-typedef void(*KeyboardEventCb)(int, int, int, int, void *data);
-
-typedef void(*MouseCursorEventCb)(double, double, void *data);
-
-typedef struct {
-	KeyboardEventCb kcb;
-	void *kdata;
-	MouseButtonEventCb mcb;
-	void *mdata;
-	MouseCursorEventCb ccb;
-	void *cdata;
-} GLFWCallbackEventStorage;
+#include "glfw3/glfw3.h"
+#include "GUI/InputEventsListener.h"
+#include "GUILib.h"
 
 class Window
 {
 public:
-	static Window* Create(int width, int height, std::string *title);
-	double GetTime();
-	bool IsWindowShouldClose();
-	void PollEvents();
-	bool IsKeyPressed(int keyCode);
-	void SetMouseButtonEventCb(MouseButtonEventCb cb, void *data);
-	void SetMouseCursorEventCb(MouseCursorEventCb cb, void *data);
-	void SetKeyboardEventCb(KeyboardEventCb cb, void *data);
-	~Window();
+	GUILIB_API Window(const std::string &title, int width, int height);
+	GUILIB_API ~Window();
+	GUILIB_API double GetTime();
+	GUILIB_API bool IsWindowShouldClose();
+	GUILIB_API void PollEvents();
+	GUILIB_API void SwapBuffers();
+	GUILIB_API void AddInputEventsListener(InputEventsListener *listener);
+	GUILIB_API void RemoveInputEventsListener(InputEventsListener *listener);
 private:
-	Window(GLFWwindow *glfwWindow, int width, int height, std::string *title);
-	GLFWwindow *glfwWindow;
-	std::string title;
-	int width;
-	int height;
-	GLFWCallbackEventStorage eventSorage;
+	void SubscribeToGLFWInputEvents();
+	GLFWwindow *glfwWindow = nullptr;
+	std::list<InputEventsListener*> inputEventsListeners;
 };
 
+#endif //GUI_WINDOW_HEADER

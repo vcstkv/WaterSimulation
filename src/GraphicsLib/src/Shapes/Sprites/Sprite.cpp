@@ -3,15 +3,11 @@
 #include <iostream>
 #include <vector>
 
-Sprite::Sprite(float x, float y)
+Sprite::Sprite(const glm::vec3 &c)
 {
-	color = glm::vec4(-1);
-	textureId = 0;
-	
 	InitializeSprite();
 
-	model = glm::scale(glm::vec3(-1, 1, 1));
-	SetPosition(x, y);
+	SetPosition(c);
 }
 
 Sprite::~Sprite()
@@ -24,9 +20,21 @@ Sprite::~Sprite()
 
 void Sprite::InitializeSprite()
 {
-	float vertices[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	float vertices[] =
+	{ 
+		-0.5f, -0.5f, 0.f,
+		-0.5f,  0.5f, 0.f,
+		 0.5f,  0.5f, 0.f,
+		 0.5f, -0.5f, 0.f
+	};
 
-	float uvs[] = { 1, 1, 1, 0, 0, 0, 0, 1 };
+	float uvs[] =
+	{ 
+		1.f, 1.f,
+		1.f, 0.f,
+		0.f, 0.f,
+		0.f, 1.f
+	};
 
 	unsigned int indices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -35,8 +43,8 @@ void Sprite::InitializeSprite()
 
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount * 2, vertices, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexCount * dim, vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, dim, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glGenBuffers(1, &textureBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
@@ -53,18 +61,9 @@ void Sprite::InitializeSprite()
 
 void Sprite::SetSize(float width, float height)
 {
+	Scale(glm::vec3(width/this->width, height/this->height, 1));
 	this->width = width;
 	this->height = height;
-	float vertices[] =
-	{
-		-width / 2.f, -height / 2.f,
-		-width / 2.f,  height / 2.f,
-		 width / 2.f,  height / 2.f,
-		 width / 2.f, -height / 2.f
-	};
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertexCount * 2, vertices);
 }
 
 void Sprite::SetTextureShape(float uvX, float uvY, int width, int height)
@@ -84,46 +83,48 @@ void Sprite::SetTextureShape(float uvX, float uvY, int width, int height)
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertexCount * 2, uvs);
 }
 
-void Sprite::Scale(glm::vec3 *delta)
+void Sprite::Scale(const glm::vec3 &delta)
 {
-	model = glm::scale(model, *delta);
+	model = glm::scale(model, delta);
 }
 
-void Sprite::SetScale(glm::vec3 *scale)
+void Sprite::SetScale(const glm::vec3 &scale)
 {
-	model = glm::scale(*scale);
+	model = glm::scale(scale);
 }
 
-void Sprite::SetPosition(float x, float y)
+void Sprite::SetPosition(float x, float y, float z)
 {
 	model[3].x = x;
 	model[3].y = y;
+	model[3].z = z;
 }
 
-void Sprite::SetPosition(glm::vec3 *position)
+void Sprite::SetPosition(const glm::vec3 &position)
 {
-	model[3].x = position->x;
-	model[3].y = position->y;
+	model[3].x = position.x;
+	model[3].y = position.y;
+	model[3].z = position.z;
 }
 
-void Sprite::Translate(float dx, float dy)
+void Sprite::Translate(float dx, float dy, float dz)
 {
 	model[3].x += dx;
 	model[3].y += dy;
+	model[3].z += dz;
 }
 
-void Sprite::Translate(glm::vec3 *dPos)
+void Sprite::Translate(const glm::vec3 &dPos)
 {
-	model[3].x += dPos->x;
-	model[3].y += dPos->y;
+	model[3].x += dPos.x;
+	model[3].y += dPos.y;
+	model[3].z += dPos.z;
 }
 
 void Sprite::SetTexture(const char* filePath, bool isStdFolder)
 {
 	textureId = texturesController->AddTexture(filePath, isStdFolder);
-	width = texturesController->GetTextureWidth(textureId);
-	height = texturesController->GetTextureHeight(textureId);
-	SetSize(width, height);
+	SetSize(texturesController->GetTextureWidth(textureId), texturesController->GetTextureHeight(textureId));
 }
 
 void Sprite::SetActiveShaderProgram(int localShaderProgramId)
@@ -136,9 +137,9 @@ void Sprite::SetActiveShaderProgram(int localShaderProgramId)
 	currentShaderProgram = localShaderProgramId;
 }
 
-void Sprite::SetColor(glm::vec4 *color)
+void Sprite::SetColor(const glm::vec4 &color)
 {
-	this->color = *color;
+	this->color = color;
 }
 
 TexturesController *Sprite::texturesController;

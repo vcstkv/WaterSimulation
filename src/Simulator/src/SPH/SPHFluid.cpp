@@ -7,7 +7,7 @@ SPHFluid::SPHFluid(SPHFluidParams &params, BoundaryBox &box)
 	this->params = params;
 	particles = new std::vector<SPHParticle>(params.particlesCount);
 	f = new TextFont("..\\data\\Fonts\\arial\\arial.fnt");
-	f->SetParamValue(&glm::vec4(0.6, -6., 0.25, 34));
+	f->SetParamValue(glm::vec4(0.6, -6., 0.25, 34));
 	solver = nullptr;
 	this->boundaryBox = box;
 	Init();
@@ -24,7 +24,7 @@ void SPHFluid::Update(float delta)
 	//solver->UseBoundary(boundaryBox, *particles);
 }
 
-void SPHFluid::Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view)
+void SPHFluid::Render(const std::shared_ptr<const Graphics> graphics, const glm::mat4 &projection, const glm::mat4 &view)
 {
 	solver->Render(projection, view);
 	//for (uint i = 0; i < particles->size(); i++)

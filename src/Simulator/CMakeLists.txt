@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+set (CMAKE_CXX_STANDARD 17)
+
 file(GLOB_RECURSE SOURCES 
 	"*.h"
 	"*.hpp"
@@ -28,8 +30,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 #	PUBLIC glew32s
 )
 
-add_custom_command(
-	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} 
-	-E copy $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/bin
-)
+#add_custom_command(
+#	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} 
+#	-E copy $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/bin
+#)

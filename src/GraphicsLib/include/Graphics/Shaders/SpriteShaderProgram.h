@@ -10,6 +10,5 @@ public:
 	GLint texSamplerShLoc;
 	GLint matDiffColorShLoc;
 	GLint isColoredShLoc;
-	
 };
 

@@ -1,150 +1,83 @@
-#define GAMEENGINE_EXPORTS
+#define GUILIB_EXPORT
 #include "GUI/ScreenController.h"
+
 #include "GUI/Screen.h"
-#include <thread>
-#include <chrono>
 
-
-ScreenController::ScreenController(int screenWidth, int screenHeight, std::string *title)
+ScreenController::ScreenController()
 {
-	screens = new std::vector<Screen*>();
-	//Screen::SetScreenController(this);
-	window = Window::Create(screenWidth, screenHeight, title);
-	if (window == nullptr)
-	{
-		system("pause");
-		exit(1);
-	}
-
-	window->SetMouseButtonEventCb(
-	[](int btn, int action, int mods, void *data)
-	{
-		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
-		if (!s || s->empty())
-		{
-			return;
-		}
-		s->back()->OnMouseButtonEvent(btn, action, mods);
-	}, screens);
-
-	window->SetMouseCursorEventCb(
-	[](double x, double y, void *data)
-	{
-		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
-		if (!s || s->empty())
-		{
-			return;
-		}
-		s->back()->OnMouseCursorEvent(x, y);
-	}, screens);
-
-	window->SetKeyboardEventCb(
-	[](int btn, int scanCode, int action, int mods, void *data)
-	{
-		std::vector<Screen*> *s = static_cast<std::vector<Screen*>*>(data);
-		if (!s || s->empty())
-		{
-			return;
-		}
-		s->back()->OnKeyboardEvent(btn, scanCode, action, mods);
-	}, screens);
-
-	this->screenHeight = screenHeight;
-	this->screenWidth = screenWidth;
-	this->title = *title;
-	graphics = new Graphics();
-	graphics->SetScreenSize(screenWidth, screenHeight);
 }
-
-
 
 ScreenController::~ScreenController()
 {
-	for (unsigned int i = 0; i < screens->size(); i++)
-	{
-		delete (*screens)[i];
-	}
-	delete screens;
-	delete window;
-	delete graphics;
 }
 
-void ScreenController::StartMainLoop()
+void ScreenController::OnMouseScrollEvent(double offsetX, double offsetY)
 {
-	double lastTime = 0;
-	double delta = 0;
-	int FPS = 60;
-	long constTimeTick = 1. / FPS;
-	do
+	if (screens.empty())
 	{
-		//OnKeyboardEvent();
-		//std::this_thread::sleep_for(std::chrono::microseconds(constTimeTick));
-		delta = window->GetTime() - lastTime;
-
-		lastTime = delta + lastTime;
-
-		UpdateScreen(delta);
-
-		DrawScreen(graphics);
-
-		window->PollEvents();	
-
-		//printf("\nFPS: %f", delta);
-		
-	} while (window->IsWindowShouldClose());
+		return;
+	}
+	screens.top()->OnMouseScrollEvent(offsetX, offsetY);
 }
 
-void ScreenController::OnKeyboardEvent()
+void ScreenController::OnMouseButtonEvent(int btn, int action, int mods)
 {
-	for (unsigned int i = GLFW_KEY_SPACE; i < GLFW_KEY_MENU; i++)
+	if (screens.empty())
 	{
-		if (window->IsKeyPressed(i))
-		{
-			isKeyPressed = false;
-			for (unsigned int j = 0; j < pressedKeysId.size(); j++)
-			{
-				if (i == pressedKeysId[j])
-				{
-					isKeyPressed = true;
-				}
-			}
-			if (!isKeyPressed)
-			{
-				pressedKeysId.push_back(i);
-			}
-			screens->back()->OnKeyPress(i, isKeyPressed);
-		}
+		return;
 	}
-	for (unsigned int i = 0; i < pressedKeysId.size(); i++)
-	{
-		if (!window->IsKeyPressed(pressedKeysId[i]))
-		{
-			screens->back()->OnKeyRelease(pressedKeysId[i]);
-			pressedKeysId.erase(pressedKeysId.begin() + i);
-		}
-	}
+	screens.top()->OnMouseButtonEvent(btn, action, mods);
 }
 
-int ScreenController::AddScreen(Screen *screen)
+void ScreenController::OnMouseCursorEvent(double x, double y)
 {
-	screens->push_back(screen);
-	screen->SetScreenController(this);
-	screen->Initialize();
-	return screens->size() - 1;
+	if (screens.empty())
+	{
+		return;
+	}
+	screens.top()->OnMouseCursorEvent(x, y);
+}
+
+void ScreenController::OnKeyboardEvent(int btn, int scanCode, int action, int mods)
+{
+	if (screens.empty())
+	{
+		return;
+	}
+	screens.top()->OnKeyboardEvent(btn, scanCode, action, mods);
+}
+
+int ScreenController::AddScreen(std::unique_ptr<Screen> screen)
+{
+	screens.emplace(std::move(screen));
+	screens.top()->SetScreenController(this);
+	screens.top()->Initialize();
+	return screens.size() - 1;
 }
 
 void ScreenController::PreviousScreen()
 {
-	delete screens->back();
-	screens->pop_back();
+	if (screens.empty())
+	{
+		return;
+	}
+	screens.pop();
 }
 
-void ScreenController::DrawScreen(Graphics *graphics)
+void ScreenController::DrawScreen(const std::shared_ptr<const Graphics> graphics)
 {
-	screens->back()->Render(graphics);
+	if (screens.empty())
+	{
+		return;
+	}
+	screens.top()->Render(graphics);
 }
 
-void ScreenController::UpdateScreen(double delta)
+void ScreenController::UpdateScreen(float delta)
 {
-	screens->back()->Update(delta);
+	if (screens.empty())
+	{
+		return;
+	}
+	screens.top()->Update(delta);
 }

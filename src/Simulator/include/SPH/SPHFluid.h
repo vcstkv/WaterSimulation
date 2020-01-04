@@ -16,7 +16,7 @@ public:
 	SPHFluid(SPHFluidParams &params, BoundaryBox &box);
 	~SPHFluid();
 	void Update(float delta);
-	void Render(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view);
+	void Render(const std::shared_ptr<const Graphics> graphics, const glm::mat4 &projection, const glm::mat4 &view);
 	void DragParticle(float x, float y, uint particleNum);
 	void SetBoundaryBox(BoundaryBox &box);
 	void AdjustParams(SPHFluidParams& params);

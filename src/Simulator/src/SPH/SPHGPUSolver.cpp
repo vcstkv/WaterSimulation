@@ -362,7 +362,7 @@ void SPHGPUSolver::UpdateParams(SPHFluidParams &params, BoundaryBox &box)
 	glUniform1f(accumulateForces.GetUniformLocation("mu"), params.viscocity);
 	glUniform1f(accumulateForces.GetUniformLocation("s_tens_coeff"), params.surfaceTension);
 	glUniform1f(accumulateForces.GetUniformLocation("s_tens_tresh"), params.tensionTreshold);
-	glUniform1f(accumulateForces.GetUniformLocation("g"), 0.f/*-9.81f*/);
+	glUniform1f(accumulateForces.GetUniformLocation("g"), -9.81f);
 	glUniform1ui(accumulateForces.GetUniformLocation("index_max_neighbors"), params.avgKernelParticles);
 	accumulateForces.Disable();
 
@@ -396,7 +396,7 @@ void SPHGPUSolver::UpdateParams(SPHFluidParams &params, BoundaryBox &box)
 
 	render.Enable();
 	glUniform1f(render.GetUniformLocation("k_ring_radius"), params.effectiveRadius);
-	glUniform1f(render.GetUniformLocation("p_ring_radius"), 1.5f * params.particleRadius);
+	glUniform1f(render.GetUniformLocation("p_ring_radius"), 2.5f * params.particleRadius);
 	glUniform1f(render.GetUniformLocation("k_ring_width"), 0.005);
 	glUniform1f(render.GetUniformLocation("p_ring_width"), 0.005);
 	render.Disable();
@@ -443,11 +443,11 @@ void SPHGPUSolver::Advect(SPHFluidParams &params, std::vector<SPHParticle> &part
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, 0);
 }
 
-void SPHGPUSolver::Render(glm::mat4 *projection, glm::mat4 * view)
+void SPHGPUSolver::Render(const glm::mat4 &projection, const glm::mat4 &view)
 {
 	render.Enable();
-	glUniformMatrix4fv(render.GetUniformLocation("mvp"), 1, GL_FALSE, &((*projection) * (*view))[0][0]);
-	glUniformMatrix4fv(render.GetUniformLocation("p"), 1, GL_FALSE, &((*projection))[0][0]);
+	glUniformMatrix4fv(render.GetUniformLocation("mvp"), 1, GL_FALSE, &(projection * view)[0][0]);
+	glUniformMatrix4fv(render.GetUniformLocation("p"), 1, GL_FALSE, &(projection)[0][0]);
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
 	glDrawArrays(GL_POINTS, 0, particlesCount);

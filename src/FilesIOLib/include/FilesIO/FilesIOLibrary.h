@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <fstream>
 
 #ifdef FILESIOLIBRARY_EXPORTS
@@ -11,13 +10,19 @@
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 
-class FilesIOLibrary
+namespace FilesIOLibrary
 {
-public:
 	template <typename T>
-	FIOL_API static void WriteBinaryValue(std::ofstream *output, T value);
+	void WriteBinaryValue(std::ofstream &output, const T&& value)
+	{
+		output.write((char*)value, sizeof(T));
+	}
 	template <typename T>
-	FIOL_API static void ReadBinaryValue(uint8_t **buffer, T *value, uint32_t *offset);
-	FIOL_API static bool LoadFile(const char *fileName, uint8_t **buffer, uint32_t *size);
+	T ReadBinaryValue(uint8_t **buffer, T *value, uint32_t &offset)
+	{
+		*value = *(T*)(*buffer) + offset;
+		offset += sizeof(T);
+	}
+	FIOL_API bool LoadFile(const char *fileName, uint8_t **buffer, uint32_t *size);
 };
 

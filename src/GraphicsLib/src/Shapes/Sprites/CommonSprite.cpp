@@ -3,10 +3,9 @@
 
 
 
-CommonSprite::CommonSprite(float x, float y) 
-	: Sprite(x, y)
+CommonSprite::CommonSprite(const glm::vec3 &p)
+	: Sprite(p)
 {
-	currentShaderProgram = -1;
 }
 
 std::vector<SpriteShaderProgram*> CommonSprite::shaderPrograms;
@@ -28,7 +27,7 @@ void CommonSprite::SetShader(const char *vFilePath, const char *fFilePath)
 	//}
 }
 
-void CommonSprite::Draw(glm::mat4 *projection, glm::mat4 *view)
+void CommonSprite::Draw(const glm::mat4 &projection, const glm::mat4 &view)
 {
 	if (shaderPrograms.empty())
 	{
@@ -54,7 +53,7 @@ void CommonSprite::Draw(glm::mat4 *projection, glm::mat4 *view)
 		//std::cout << std::endl << shaderPrograms[currentShaderProgram]->texSamplerShLoc;
 	}
 
-	glUniformMatrix4fv(shaderPrograms[currentShaderProgram]->mvpShLoc, 1, GL_FALSE, &((*projection) * (*view) * model)[0][0]);
+	glUniformMatrix4fv(shaderPrograms[currentShaderProgram]->mvpShLoc, 1, GL_FALSE, &(projection * view * model)[0][0]);
 	//std::cout << std::endl << shaderPrograms[currentShaderProgram]->mvpShLoc;
 
 	glUniform4fv(shaderPrograms[currentShaderProgram]->matDiffColorShLoc, 1, &(color)[0]);
@@ -86,4 +85,20 @@ void CommonSprite::Draw(glm::mat4 *projection, glm::mat4 *view)
 	glBindVertexArray(0);
 
 	shaderPrograms[currentShaderProgram]->Disable();
+}
+
+#include <iostream>
+
+void CommonSprite::PrintInfo()
+{
+	std::cout << width << "; " << height << std::endl;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			std::cout << model[i][j] << " | ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 }

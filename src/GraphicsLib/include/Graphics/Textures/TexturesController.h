@@ -11,10 +11,10 @@ class TexturesController
 public:
 	TexturesController();
 	~TexturesController();
-	uint32_t AddTexture(const char *filePath, bool isStdFolder);
+	uint32_t AddTexture(std::string filePath, bool isStdFolder = true);
 	int GetTextureWidth(uint32_t textureId);
 	int GetTextureHeight(uint32_t textureId);
 private:
-	std::vector<Texture*> *textures;
+	std::vector<std::unique_ptr<Texture>> textures;
 };
 

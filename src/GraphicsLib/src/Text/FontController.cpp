@@ -1,25 +1,28 @@
+#define GRAPHICS_EXPORTS
 #include "Graphics/Text/FontController.h"
 
 
 
 FontController::FontController()
 {
-	fonts = new std::vector<TextFont*>;
 }
 
 
 FontController::~FontController()
 {
-	delete fonts;
 }
 
-uint32_t FontController::AddFont(char *filePath)
+uint32_t FontController::AddFont(const char *filePath)
 {
-	for (uint32_t i = 0; i < fonts->size(); i++)
-		if (strcmp((*fonts)[i]->GetFilePath(), filePath))
+	for (uint32_t i = 0; i < fonts.size(); i++)
+	{
+		if (!fonts[i]->GetFilePath().compare(filePath))
+		{
 			return i;
+		}
+	}
 
-	fonts->push_back(new TextFont(filePath));
+	fonts.emplace_back(std::make_shared<TextFont>(filePath));
 
-	return fonts->size()-1;
+	return fonts.size() - 1;
 }

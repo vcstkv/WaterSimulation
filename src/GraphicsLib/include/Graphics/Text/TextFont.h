@@ -21,24 +21,24 @@ struct Glyph
 class TextFont
 {
 public:
-	GRAPHICS_API void DrawText(std::wstring text, double size, glm::vec4 *color, double x, double y, glm::mat4 *projection);
-	GRAPHICS_API TextFont(char* filePath);
+	GRAPHICS_API void DrawText(std::wstring text, float size, const glm::vec4 &color, float x, float y, const glm::mat4 &projection);
+	GRAPHICS_API TextFont(const char* filePath);
 	GRAPHICS_API ~TextFont();
-	GRAPHICS_API void AddParamValue(glm::vec4 *delta);
-	GRAPHICS_API void SetParamValue(glm::vec4 *params);
-	GRAPHICS_API char* GetFilePath();
+	GRAPHICS_API void AddParamValue(const glm::vec4 &delta);
+	GRAPHICS_API void SetParamValue(const glm::vec4 &params);
+	GRAPHICS_API std::string GetFilePath();
 	GRAPHICS_API void ShowInfo();
 private:
-	void LoadFont(char *filePath);
-	Glyph *glyphs;
-	SDFChar *sprite;
-	uint32_t glyphsCount;
-	int16_t fontSize;
-	uint16_t lineHeight;
-	uint16_t base;
-	glm::vec3 scale;
-	char* name;
-	char* filePath;
+	void LoadFont(const char *filePath);
+	Glyph *glyphs = nullptr;
+	SDFChar *sprite = nullptr;
+	uint32_t glyphsCount = 0;
+	int16_t fontSize = 0;
+	uint16_t lineHeight = 0;
+	uint16_t base = 0;
+	glm::vec3 scale{ 1.f };
+	char* name = "";
+	std::string filePath;
 	
 };
 

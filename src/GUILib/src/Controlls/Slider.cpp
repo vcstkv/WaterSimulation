@@ -1,7 +1,7 @@
-#define GAMEENGINE_EXPORTS
-#include "GUI/Controlls/Slider.h"
 #include <cstdio>
 
+#define GUILIB_EXPORT
+#include "GUI/Controlls/Slider.h"
 
 Slider::Slider(float x, float y, float width, float height, glm::vec4 *color)
 {
@@ -59,10 +59,10 @@ void Slider::OnMouseCursorEvent(double x, double y)
 	}
 }
 
-void Slider::Draw(Graphics *graphics, glm::mat4 *projection, glm::mat4 *view)
+void Slider::Draw(const std::shared_ptr<const Graphics> graphics, const glm::mat4 &projection, const glm::mat4 &view)
 {
-	graphics->DrawLine(lineParams.x, lineParams.y, lineParams.z, lineParams.w, 3, &color, projection);
-	graphics->DrawCircle(circleParams.x, circleParams.y, circleParams.z, circleParams.w, &color, projection, view);
+	graphics->DrawLine(glm::vec3(lineParams.x, lineParams.y, 0), glm::vec3(lineParams.z, lineParams.w, 0), 3, color, projection, view);
+	graphics->DrawCircle(glm::vec3(circleParams.x, circleParams.y, 0), circleParams.z, circleParams.w, color, projection, view);
 }
 
 void Slider::SetCallback(SliderCb cb, void *data)

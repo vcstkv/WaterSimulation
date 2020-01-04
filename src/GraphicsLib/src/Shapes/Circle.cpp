@@ -4,16 +4,16 @@
 
 
 Circle::Circle() 
-	: Sprite(0, 0)
+	: Sprite(glm::vec3(0))
 {
 	Init();
 }
 
-Circle::Circle(float x, float y, float radius, float width, glm::vec4 *color)
-	: Sprite(x, y)
+Circle::Circle(const glm::vec3 &c, float radius, float width, const glm::vec4 &color)
+	: Sprite(c)
 {
 	Init();
-	SetCircle(x, y, radius, width, color);
+	SetCircle(c, radius, width, color);
 }
 
 void Circle::Init()
@@ -28,10 +28,10 @@ Circle::~Circle()
 	delete shaderProgram;
 }
 
-void Circle::Draw(glm::mat4 *projection, glm::mat4 *view)
+void Circle::Draw(const glm::mat4 &projection, const glm::mat4 &view)
 {
 	shaderProgram->Enable();
-	glUniformMatrix4fv(shaderProgram->mvpShLoc, 1, GL_FALSE, &((*projection) * (*view) * model)[0][0]);
+	glUniformMatrix4fv(shaderProgram->mvpShLoc, 1, GL_FALSE, &(projection * view * model)[0][0]);
 	glUniform4fv(shaderProgram->colorShLoc, 1, &(color)[0]);
 	glUniform1f(shaderProgram->innerRadiusShLoc, innerRadius);
 
@@ -47,11 +47,11 @@ void Circle::Draw(glm::mat4 *projection, glm::mat4 *view)
 	shaderProgram->Disable();
 }
 
-void Circle::SetCircle(float x, float y, float radius, float thickness, glm::vec4 *color)
+void Circle::SetCircle(const glm::vec3 &c, float radius, float thickness, const glm::vec4 &color)
 {
 	innerRadius = (radius - thickness) / radius * 0.5;
 	SetColor(color);
-	SetPosition(x, y);
+	SetPosition(c);
 	SetSize(radius * 2.f, radius * 2.f);
 }
 

@@ -2,38 +2,36 @@
 
 
 
-Texture::Texture(std::vector<uint8_t> *image, const char *filePath, uint32_t id, uint32_t width, uint32_t height)
+Texture::Texture(std::vector<uint8_t>&& image, std::string filePath, uint32_t id, uint32_t width, uint32_t height)
+	:
+	image(image),
+	filePath(std::move(filePath)),
+	id(id),
+	width(width),
+	height(height)
 {
-	this->filePath = filePath;
-	this->id = id;
-	this->width = width;
-	this->height = height;
-	this->image = new std::vector<uint8_t>(*image);
-	
 }
 
 Texture::~Texture()
 {
-	delete image;
-	delete[] filePath;
 }
 
-bool Texture::IsEqualFilePath(const char *filePath)
+bool Texture::IsEqualFilePath(const std::string &filePath)
 {
-	return stricmp(this->filePath, filePath) == 0;
+	return !this->filePath.compare(filePath);
 }
 
-int Texture::GetId()
+uint32_t Texture::GetId()
 {
 	return id;
 }
 
-int Texture::GetWidth()
+uint32_t Texture::GetWidth()
 {
 	return width;
 }
 
-int Texture::GetHeight()
+uint32_t Texture::GetHeight()
 {
 	return height;
 }

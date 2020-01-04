@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 								
 project(WaterSimulation LANGUAGES CXX)
 
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
 if(MSVC)
 	add_compile_options(/W3 /WX-)
 else()

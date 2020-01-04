@@ -1,38 +1,29 @@
-#pragma once
+#ifndef GUI_SCREEN_CONTROLLER_HEADER
+#define GUI_SCREEN_CONTROLLER_HEADER
+
+#include <stack>
+
 #include "Graphics/Graphics.h"
-#include "Window.h"
-#include <vector>
-#include <string>
-
-#ifdef GAMEENGINE_EXPORTS
-#define GAMEENGINE_API __declspec(dllexport) 
-#else
-#define GAMEENGINE_API __declspec(dllimport)
-#endif
-
+#include "GUI/InputEventsListener.h"
+#include "GUILib.h"
 
 class Screen;
 
-class ScreenController
+class ScreenController : public InputEventsListener
 {
 public:
-	GAMEENGINE_API ScreenController(int screenWidth, int screenHeight, std::string *title);
-	GAMEENGINE_API ~ScreenController();
-	GAMEENGINE_API int AddScreen(Screen *screen);
-	GAMEENGINE_API void PreviousScreen();
-	GAMEENGINE_API void StartMainLoop();
-
+	GUILIB_API ScreenController();
+	GUILIB_API ~ScreenController() override;
+	GUILIB_API int AddScreen(std::unique_ptr<Screen> screen);
+	GUILIB_API void PreviousScreen();
+	GUILIB_API void DrawScreen(const std::shared_ptr<const Graphics> graphics);
+	GUILIB_API void UpdateScreen(float delta);
+	GUILIB_API void OnMouseButtonEvent(int btn, int action, int mods) override;
+	GUILIB_API void OnMouseCursorEvent(double x, double y) override;
+	GUILIB_API void OnMouseScrollEvent(double offsetX, double offsetY) override;
+	GUILIB_API void OnKeyboardEvent(int btn, int scanCode, int action, int mods) override;
 private:
-	void DrawScreen(Graphics *graphics);
-	void UpdateScreen(double delta);
-	std::vector<Screen*> *screens;
-	void OnKeyboardEvent();
-	Window *window;
-	int screenWidth;
-	int screenHeight;
-	std::string title;
-	Graphics *graphics;
-	std::vector<int> pressedKeysId;
-	bool isKeyPressed;
+	std::stack<std::unique_ptr<Screen>> screens;
 };
 
+#endif //GUI_SCREEN_CONTROLLER_HEADER

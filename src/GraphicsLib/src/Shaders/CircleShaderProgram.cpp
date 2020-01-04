@@ -1,8 +1,6 @@
 #define GRAPHICS_EXPORTS
 #include "Graphics/Shaders/CircleShaderProgram.h"
 
-
-
 CircleShaderProgram::CircleShaderProgram(const char *vFilePath, const char *fFilePath)
 	: ShaderProgram()
 {

@@ -1,24 +1,11 @@
+#define GUILIB_EXPORT
 #include "GUI/Window.h"
-#include <stdio.h>
 
-
-
-Window::Window(GLFWwindow *glfwWindow, int width, int height, std::string *title)
+Window::Window(const std::string &title, int width, int height)
 {
-	this->glfwWindow = glfwWindow;
-	this->height = height;
-	this->width = width;
-	this->title = *title;
-}
-
-Window* Window::Create(int width, int height, std::string *title)
-{
-	GLFWwindow *glfwWindow;
-
 	if (!glfwInit())
 	{
-		fprintf(stderr, "GLFW init error\n");
-		return nullptr;
+		throw std::exception("GLFW init error");
 	}
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -26,15 +13,14 @@ Window* Window::Create(int width, int height, std::string *title)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwWindow = glfwCreateWindow(width, height, title->c_str(), NULL, NULL);
-	if (glfwWindow == NULL)
-	{
-		fprintf(stderr, "Window create error");
-		glfwTerminate();
-		return nullptr;
-	}
-
 	glfwSwapInterval(0);
+
+	glfwWindow = glfwCreateWindow(width, height, title.data(), NULL, NULL);
+	if (!glfwWindow)
+	{
+		glfwTerminate();
+		throw std::exception("glfwCreateWindow error");
+	}
 
 	glfwMakeContextCurrent(glfwWindow);
 
@@ -42,9 +28,73 @@ Window* Window::Create(int width, int height, std::string *title)
 	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetInputMode(glfwWindow, GLFW_STICKY_MOUSE_BUTTONS, GL_TRUE);
 
-	return new Window(glfwWindow, width, height, title);
+	SubscribeToGLFWInputEvents();
 }
 
+void Window::SubscribeToGLFWInputEvents()
+{
+	glfwSetWindowUserPointer(glfwWindow, this);
+
+	glfwSetMouseButtonCallback(glfwWindow,
+		[](GLFWwindow *w, int btn, int action, int mods)
+		{
+			Window *wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+			if (!wnd)
+			{
+				return;
+			}
+			for (auto listener : wnd->inputEventsListeners)
+			{
+				listener->OnMouseButtonEvent(btn, action, mods);
+			}
+		}
+	);
+
+	glfwSetCursorPosCallback(glfwWindow,
+		[](GLFWwindow *w, double x, double y)
+		{ 
+			Window *wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+			if (!wnd)
+			{
+				return;
+			}
+			for (auto listener : wnd->inputEventsListeners)
+			{
+				listener->OnMouseCursorEvent(x, y);
+			}
+		}
+	);
+
+	glfwSetScrollCallback(glfwWindow,
+		[](GLFWwindow *w, double x, double y)
+		{
+			Window *wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+			if (!wnd)
+			{
+				return;
+			}
+			for (auto listener : wnd->inputEventsListeners)
+			{
+				listener->OnMouseScrollEvent(x, y);
+			}
+		}
+	);
+
+	glfwSetKeyCallback(glfwWindow,
+		[](GLFWwindow *w, int key, int scanCode, int action, int mods)
+		{
+			Window *wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+			if (!wnd)
+			{
+				return;
+			}
+			for (auto listener : wnd->inputEventsListeners)
+			{
+				listener->OnKeyboardEvent(key, scanCode, action, mods);
+			}
+		}
+	);
+}
 
 Window::~Window()
 {
@@ -57,73 +107,43 @@ double Window::GetTime()
 	return glfwGetTime();
 }
 
-
 bool Window::IsWindowShouldClose()
 {
 	return glfwWindowShouldClose(glfwWindow) == 0;
 }
 
-void Window::PollEvents()
+void Window::SwapBuffers()
 {
 	glfwSwapBuffers(glfwWindow);
+}
+
+void Window::PollEvents()
+{
 	glfwPollEvents();
 }
 
-bool Window::IsKeyPressed(int keyCode)
+void Window::AddInputEventsListener(InputEventsListener *listener)
 {
-	return glfwGetKey(glfwWindow, keyCode) == GLFW_PRESS;
+	if (!listener)
+	{
+		return;
+	}
+
+	inputEventsListeners.push_back(listener);
 }
 
-void Window::SetMouseButtonEventCb(MouseButtonEventCb cb, void *data)
+void Window::RemoveInputEventsListener(InputEventsListener *listener)
 {
-
-	eventSorage.mcb = cb;
-	eventSorage.mdata = data;
-	glfwSetWindowUserPointer(glfwWindow, &eventSorage);
-	glfwSetMouseButtonCallback(glfwWindow,
-	[](GLFWwindow *w, int btn, int action, int mods)
+	if (!listener)
 	{
-		GLFWCallbackEventStorage *s = static_cast<GLFWCallbackEventStorage*>(glfwGetWindowUserPointer(w));
-		if (!s || !s->mcb)
-		{
-			return;
-		}
-		s->mcb(btn, action, mods, s->mdata);
-	});
-}
-
-void Window::SetMouseCursorEventCb(MouseCursorEventCb cb, void *data)
-{
-	eventSorage.ccb = cb;
-	eventSorage.cdata = data;
-	glfwSetWindowUserPointer(glfwWindow, &eventSorage);
-	glfwSetCursorPosCallback(glfwWindow,
-	[](GLFWwindow *w, double x, double y)
+		return;
+	}
+	auto it = std::find(inputEventsListeners.begin(), inputEventsListeners.end(), listener);
+	if (it == inputEventsListeners.end())
 	{
-		GLFWCallbackEventStorage *s = static_cast<GLFWCallbackEventStorage*>(glfwGetWindowUserPointer(w));
-		if (!s || !s->ccb)
-		{
-			return;
-		}
-		s->ccb(x, y, s->cdata);
-	});
-}
-
-void Window::SetKeyboardEventCb(KeyboardEventCb cb, void * data)
-{
-	eventSorage.kcb = cb;
-	eventSorage.kdata = data;
-	glfwSetWindowUserPointer(glfwWindow, &eventSorage);
-	glfwSetKeyCallback(glfwWindow,
-	[](GLFWwindow *w, int key, int scanCode, int action, int mods)
-	{
-		GLFWCallbackEventStorage *s = static_cast<GLFWCallbackEventStorage*>(glfwGetWindowUserPointer(w));
-		if (!s || !s->kcb)
-		{
-			return;
-		}
-		s->kcb(key, scanCode, action, mods, s->kdata);
-	});
+		return;
+	}
+	inputEventsListeners.erase(it);
 }
 
 

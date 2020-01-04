@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)					
 
+set (CMAKE_CXX_STANDARD 17)
+
 file(GLOB_RECURSE SOURCES 
 	"*.h"
 	"*.hpp"
@@ -24,8 +26,8 @@ target_link_libraries( libgui
 	PUBLIC glfw3
 )
 
-add_custom_command(
-	TARGET libgui POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} 
-	-E copy $<TARGET_FILE:libgui> ${CMAKE_SOURCE_DIR}/bin 
-)					
+#add_custom_command(
+#	TARGET libgui POST_BUILD 
+#    COMMAND ${CMAKE_COMMAND} 
+#	-E copy $<TARGET_FILE:libgui> ${CMAKE_SOURCE_DIR}/bin 
+#)					

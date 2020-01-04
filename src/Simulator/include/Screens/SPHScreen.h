@@ -7,14 +7,13 @@ class SPHScreen :
 {
 public:
 	SPHScreen(int width, int height);
-	virtual ~SPHScreen();
-	void Update(float delta);
-	void Render(Graphics *graphics);
-	void OnMouseButtonEvent(int btn, int action, int mods);
-	void OnMouseCursorEvent(double x, double y);
-	void OnKeyboardEvent(int key, int scanCode, int action, int mods);
-	void OnKeyPress(int buttonID, bool isPressed);
-	void OnKeyRelease(int buttonID);
+	~SPHScreen() override;
+	void Update(float delta) override;
+	void Render(const std::shared_ptr<const Graphics> graphics) override;
+	void OnMouseButtonEvent(int btn, int action, int mods) override;
+	void OnMouseCursorEvent(double x, double y) override;
+	void OnMouseScrollEvent(double offsetX, double offsetY) override;
+	void OnKeyboardEvent(int btn, int scanCode, int action, int mods) override;
 	void Initialize();
 private:
 	SPHFluid *fluid;

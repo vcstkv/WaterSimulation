@@ -1,34 +1,27 @@
-#pragma once
-#include "Graphics/Graphics.h"
-#include "ScreenController.h"
+#ifndef GUI_SCREEN_HEADER
+#define GUI_SCREEN_HEADER
 
-#ifdef GAMEENGINE_EXPORTS
-#define GAMEENGINE_API __declspec(dllexport) 
-#else
-#define GAMEENGINE_API __declspec(dllimport)
-#endif
+#include "Graphics/Graphics.h"
+#include "GUI/InputEventsListener.h"
+#include "GUILib.h"
 
 class ScreenController;
 
-class Screen
+class Screen : public InputEventsListener
 {
 public:
-	GAMEENGINE_API Screen(int width, int height);
-	GAMEENGINE_API virtual ~Screen();
-	GAMEENGINE_API virtual void Update(float delta) = 0;
-	GAMEENGINE_API virtual void Render(Graphics *graphics) = 0;
-	GAMEENGINE_API virtual void OnMouseButtonEvent(int btn, int action, int mods) = 0;
-	GAMEENGINE_API virtual void OnMouseCursorEvent(double x, double y) = 0;
-	GAMEENGINE_API virtual void OnKeyboardEvent(int key, int scanCode, int action, int mods) = 0;
-	GAMEENGINE_API virtual void OnKeyPress(int buttonID, bool isPressed) = 0;
-	GAMEENGINE_API virtual void OnKeyRelease(int buttonID) = 0;
-	GAMEENGINE_API virtual void Initialize() = 0;
-	GAMEENGINE_API void SetScreenController(ScreenController *screenController);
-	int width;
-	int height;
+	GUILIB_API Screen(int width, int height);
+	GUILIB_API virtual ~Screen();
+	GUILIB_API virtual void Update(float delta) = 0;
+	GUILIB_API virtual void Render(const std::shared_ptr<const Graphics> graphics) = 0;
+	GUILIB_API virtual void Initialize() = 0;
+	GUILIB_API void SetScreenController(ScreenController *screenController);
+	int width = 800;
+	int height = 600;
 protected:
 	ScreenController *screenController;
 	glm::mat4 projection;
 	glm::mat4 view;
 };
 
+#endif //GUI_SCREEN_HEADER

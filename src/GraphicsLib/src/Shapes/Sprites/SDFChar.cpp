@@ -3,11 +3,11 @@
 
 
 
-SDFChar::SDFChar(glm::vec2 *drawParams)
-	 : Sprite(0,0)
+SDFChar::SDFChar(const glm::vec2 &drawParams)
+	 : Sprite(glm::vec3(0))
 {
 	currentShaderProgram = -1;
-	params = glm::vec4(*drawParams, 0, 0);
+	params = glm::vec4(drawParams, 0, 0);
 	borderColor = glm::vec4(0);
 }
 
@@ -30,7 +30,7 @@ void SDFChar::SetShader(const char *vFilePath, const char *fFilePath)
 	//}
 }
 
-void SDFChar::Draw(glm::mat4 *projection, glm::mat4 *view)
+void SDFChar::Draw(const glm::mat4 &projection, const glm::mat4 &view)
 {
 	if (shaderPrograms.empty())
 	{
@@ -53,7 +53,7 @@ void SDFChar::Draw(glm::mat4 *projection, glm::mat4 *view)
 		glUniform1i(shaderPrograms[currentShaderProgram]->texSamplerShLoc, 0);
 	}
 
-	glUniformMatrix4fv(shaderPrograms[currentShaderProgram]->mvpShLoc, 1, GL_FALSE, &((*projection) * (*view) * model)[0][0]);
+	glUniformMatrix4fv(shaderPrograms[currentShaderProgram]->mvpShLoc, 1, GL_FALSE, &(projection * view * model)[0][0]);
 
 	glUniform4fv(shaderPrograms[currentShaderProgram]->colorShLoc, 1, &(color)[0]);
 	glUniform4fv(shaderPrograms[currentShaderProgram]->borderColorShLoc, 1, &(borderColor)[0]);
@@ -76,11 +76,11 @@ void SDFChar::Draw(glm::mat4 *projection, glm::mat4 *view)
 	shaderPrograms[currentShaderProgram]->Disable();
 }
 
-void SDFChar::SetBorder(glm::vec4 *borderColor, glm::vec2 *borderDrawParams)
+void SDFChar::SetBorder(const glm::vec4 &borderColor, const glm::vec2 &borderDrawParams)
 {
-	this->borderColor = *borderColor;
-	params.z = borderDrawParams->x;
-	params.w = borderDrawParams->y;
+	this->borderColor = borderColor;
+	params.z = borderDrawParams.x;
+	params.w = borderDrawParams.y;
 }
 
 void SDFChar::DeleteBorder()
@@ -90,25 +90,25 @@ void SDFChar::DeleteBorder()
 	borderColor.a = 0;
 }
 
-void SDFChar::SetBorderParams(glm::vec2 *params)
+void SDFChar::SetBorderParams(const glm::vec2 &params)
 {
-	this->params.z = params->x;
-	this->params.w = params->y;
+	this->params.z = params.x;
+	this->params.w = params.y;
 }
 
-void SDFChar::SetCharParams(glm::vec2 *params)
+void SDFChar::SetCharParams(const glm::vec2 &params)
 {
-	this->params.x = params->x;
-	this->params.y = params->y;
+	this->params.x = params.x;
+	this->params.y = params.y;
 }
 
-void SDFChar::SetParams(glm::vec4 *params)
+void SDFChar::SetParams(const glm::vec4 &params)
 {
-	this->params = *params;
+	this->params = params;
 }
 
-void SDFChar::AddParams(glm::vec4 *delta)
+void SDFChar::AddParams(const glm::vec4 &delta)
 {
-	this->params += *delta;
+	this->params += delta;
 	printf("\n%f\t| %f\t| %f\t| %f", params.x, params.y, params.z, params.w);
 }

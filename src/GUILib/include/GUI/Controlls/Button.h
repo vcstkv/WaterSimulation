@@ -1,33 +1,36 @@
-#pragma once
+#ifndef GUI_BUTTON_HEADER
+#define GUI_BUTTON_HEADER
+
 #include "Graphics/Shapes/Sprites/CommonSprite.h"
 #include "glm/glm.hpp"
+#include "GUILib.h"
 
-#ifdef GAMEENGINE_EXPORTS
-#define GAMEENGINE_API __declspec(dllexport) 
-#else
-#define GAMEENGINE_API __declspec(dllimport)
-#endif
+enum class ButtonType
+{
+	Pictured,
+	Colored
+};
 
-#define PICTURED_BUTTON 0
-#define COLORED_BUTTON 1
+typedef void (*OnBtnPressedCb)();
 
 class Button
 {
 public:
-	GAMEENGINE_API Button(int x, int y, int width, int heigth);
-	GAMEENGINE_API ~Button();
-	GAMEENGINE_API void Press();
-	GAMEENGINE_API void Release();
-	GAMEENGINE_API void SetText(wchar_t *text);
-	GAMEENGINE_API void Draw(glm::mat4 *projection, glm::mat4 *view);
-	GAMEENGINE_API void SetCallback(void (*OnPressedFunc)());
+	GUILIB_API Button(int x, int y, int width, int heigth);
+	GUILIB_API ~Button();
+	GUILIB_API void Press();
+	GUILIB_API void Release();
+	GUILIB_API void SetText(wchar_t *text);
+	GUILIB_API void Draw(const glm::mat4 &projection, const glm::mat4 &view);
+	GUILIB_API void SetCallback(OnBtnPressedCb cb);
 
 private:
-	uint8_t type;
-	wchar_t *text;
-	void (*OnPressed)();
-	CommonSprite *sprite;
-	CommonSprite *pressedSprite;
-	bool isPressed;
+	ButtonType type = ButtonType::Colored;
+	wchar_t *text = L"";
+	OnBtnPressedCb onPressedCb = nullptr;
+	CommonSprite *sprite = nullptr;
+	CommonSprite *pressedSprite = nullptr;
+	bool isPressed = false;
 };
 
+#endif // GUI_BUTTON_HEADER
