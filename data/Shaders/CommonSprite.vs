@@ -3,12 +3,13 @@
 layout(location = 0) in vec3 vertexCoords;
 layout(location = 1) in vec2 textureCoords;
 
-out vec2 uv;
+uniform mat4 mvp;
+uniform mat3 textureRegion;
 
-uniform mat4 MVP;
+out vec2 uv;
 
 void main()
 {
-	gl_Position = MVP * vec4(vertexCoords, 1.0);
-	uv = textureCoords;
+    gl_Position = mvp * vec4(vertexCoords, 1.0);
+	uv = (textureRegion * vec3(textureCoords.x, 1.0 - textureCoords.y, 1.0)).xy;
 }

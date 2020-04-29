@@ -1,0 +1,4 @@
+[submodule "lib/GSEngine"]
+	path = lib/GSEngine
+	url = git@github.com:FredieJackson/GSEngine.git
+	branch = develop
