@@ -1,4 +1,5 @@
 bin
-build
-.vs
+*build*
+*.vs
 *.db
+*idea
