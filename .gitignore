@@ -1,5 +1,8 @@
 bin
-*build*
-*.vs
-*.db
-*idea
+build
+.vs
+.db
+.idea
+.cache
+.vscode
+data

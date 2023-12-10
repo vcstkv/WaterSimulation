@@ -22,12 +22,12 @@ Returns:    None
 Creator:    John Cox, 3/2017
 ------------------------------------------------------------------------------------------------*/
 
-uniform float cellSize;
+uniform double cellSize;
 uniform uint cellsCount;
-uniform float gridX;
-uniform float gridY;
+uniform double gridX;
+uniform double gridY;
 
-uint Hash(vec2 pos)
+uint Hash(dvec2 pos)
 {
 	return uint(floor((pos.y - gridY) / cellSize) * cellsCount + floor((pos.x - gridX)/ cellSize));
 }

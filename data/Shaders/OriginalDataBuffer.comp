@@ -12,14 +12,15 @@ Creator:    John Cox, 3/2017
 ------------------------------------------------------------------------------------------------*/
 struct Particle
 {
-    vec2 pos;
-	vec2 vel;
-	vec2 force;
-	vec2 prevForce;
-	float pressure;
-	float density;
-	float mass;
+    dvec2 pos;
+	dvec2 vel;
+	dvec2 force;
+	dvec2 prevForce;
+	double pressure;
+	double density;
+	double mass;
 	uint bucket;
+	uint pad;
 };
 
 // whatever size the user wants

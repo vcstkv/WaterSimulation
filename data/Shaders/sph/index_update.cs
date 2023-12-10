@@ -10,14 +10,15 @@ struct Index{
 };
 
 struct Particle {
-    vec2 r;
-    vec2 v;
-    vec2 f;
-    vec2 prev_f;
-    float p; // pressure
-    float d; // density
-    float m; // mass
+    dvec2 r;
+    dvec2 v;
+    dvec2 f;
+    dvec2 prev_f;
+    double p; // pressure
+    double d; // density
+    double m; // mass
     uint bucket;
+    uint pad;
 };
 
 layout(std430, binding=0) buffer Particles {
